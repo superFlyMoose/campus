@@ -2,6 +2,8 @@ package com.campus.management.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.campus.management.config.RabbitMqConfig;
+import com.campus.management.dto.ActivityMessage;
 import com.campus.management.entity.Activity;
 import com.campus.management.entity.ActivityRegistration;
 import com.campus.management.entity.SysUser;
@@ -15,9 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper, ActivityRegistration> {
 
     private final ActivityService activityService;
+    private final ActivityMessageProducer activityMessageProducer;
+    private final DashboardCacheService dashboardCacheService;
 
-    public RegistrationService(ActivityService activityService) {
+    public RegistrationService(ActivityService activityService,
+                               ActivityMessageProducer activityMessageProducer,
+                               DashboardCacheService dashboardCacheService) {
         this.activityService = activityService;
+        this.activityMessageProducer = activityMessageProducer;
+        this.dashboardCacheService = dashboardCacheService;
     }
 
     public List<ActivityRegistration> getMyRegistrations(Long userId) {
@@ -50,6 +58,8 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         save(registration);
         activity.setCurrentPeople(activity.getCurrentPeople() + 1);
         activityService.updateById(activity);
+        dashboardCacheService.evictDashboardCache();
+        sendRegistrationCreatedMessage(activity, currentUser);
     }
 
     @Transactional
@@ -69,5 +79,18 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         removeById(registrationId);
         activity.setCurrentPeople(Math.max(0, activity.getCurrentPeople() - 1));
         activityService.updateById(activity);
+        dashboardCacheService.evictDashboardCache();
+    }
+
+    private void sendRegistrationCreatedMessage(Activity activity, SysUser currentUser) {
+        ActivityMessage message = new ActivityMessage();
+        message.setEventType("REGISTRATION_CREATED");
+        message.setActivityId(activity.getId());
+        message.setActivityTitle(activity.getTitle());
+        message.setUserId(currentUser.getId());
+        message.setUsername(currentUser.getUsername());
+        message.setEventTime(LocalDateTime.now());
+        message.setDescription("用户报名活动成功");
+        activityMessageProducer.send(RabbitMqConfig.REGISTRATION_CREATED_ROUTING_KEY, message);
     }
 }

@@ -3,7 +3,9 @@ package com.campus.management.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.campus.management.config.RabbitMqConfig;
 import com.campus.management.dto.ActivityForm;
+import com.campus.management.dto.ActivityMessage;
 import com.campus.management.entity.Activity;
 import com.campus.management.mapper.ActivityMapper;
 import java.time.LocalDateTime;
@@ -13,6 +15,14 @@ import org.springframework.util.StringUtils;
 
 @Service
 public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
+
+    private final ActivityMessageProducer activityMessageProducer;
+    private final DashboardCacheService dashboardCacheService;
+
+    public ActivityService(ActivityMessageProducer activityMessageProducer, DashboardCacheService dashboardCacheService) {
+        this.activityMessageProducer = activityMessageProducer;
+        this.dashboardCacheService = dashboardCacheService;
+    }
 
     public Page<Activity> searchActivities(String keyword, String location, int pageNum, int pageSize) {
         LambdaQueryWrapper<Activity> wrapper = new LambdaQueryWrapper<>();
@@ -57,6 +67,8 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
         activity.setStatus(0);
         activity.setIsDeleted(0);
         save(activity);
+        dashboardCacheService.evictDashboardCache();
+        sendActivityCreatedMessage(activity);
     }
 
     public void updateActivity(Long id, ActivityForm form) {
@@ -69,10 +81,12 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
         activity.setEndTime(form.getEndTime());
         activity.setMaxPeople(form.getMaxPeople());
         updateById(activity);
+        dashboardCacheService.evictDashboardCache();
     }
 
     public void removeActivity(Long id) {
         removeById(id);
+        dashboardCacheService.evictDashboardCache();
     }
 
     public boolean canRegister(Activity activity) {
@@ -86,5 +100,15 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
             && !form.getEndTime().isAfter(form.getStartTime())) {
             throw new IllegalArgumentException("结束时间必须晚于开始时间");
         }
+    }
+
+    private void sendActivityCreatedMessage(Activity activity) {
+        ActivityMessage message = new ActivityMessage();
+        message.setEventType("ACTIVITY_CREATED");
+        message.setActivityId(activity.getId());
+        message.setActivityTitle(activity.getTitle());
+        message.setEventTime(LocalDateTime.now());
+        message.setDescription("新活动发布成功");
+        activityMessageProducer.send(RabbitMqConfig.ACTIVITY_CREATED_ROUTING_KEY, message);
     }
 }
