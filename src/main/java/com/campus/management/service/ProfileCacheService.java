@@ -37,7 +37,7 @@ public class ProfileCacheService {
         try {
             return objectMapper.readValue(cachedJson, ProfileCacheData.class);
         } catch (JsonProcessingException exception) {
-            log.error("Profile cache parse failed, key={}", buildProfileCacheKey(userId), exception);
+            log.error("用户资料缓存反序列化失败, key={}", buildProfileCacheKey(userId), exception);
             evictProfileCache(userId);
             return null;
         }
@@ -55,12 +55,11 @@ public class ProfileCacheService {
         try {
             String cacheValue = objectMapper.writeValueAsString(cacheData);
             stringRedisTemplate.opsForValue().set(cacheKey, cacheValue, CACHE_TTL);
-            log.info("Profile cache stored, key={}, registrations={}", cacheKey, cacheData.getRegistrations().size());
         } catch (JsonProcessingException exception) {
-            log.error("Profile cache serialization failed, key={}", cacheKey, exception);
+            log.error("用户资料缓存序列化失败, key={}", cacheKey, exception);
             evictProfileCache(user.getId());
         } catch (RuntimeException exception) {
-            log.error("Profile cache write failed, key={}", cacheKey, exception);
+            log.error("用户资料缓存写入失败, key={}", cacheKey, exception);
             evictProfileCache(user.getId());
         }
     }
@@ -69,24 +68,21 @@ public class ProfileCacheService {
         String cacheKey = buildProfileCacheKey(userId);
         try {
             stringRedisTemplate.delete(cacheKey);
-            log.info("Profile cache evicted, key={}", cacheKey);
         } catch (RuntimeException exception) {
-            log.error("Profile cache eviction failed, key={}", cacheKey, exception);
+            log.error("用户资料缓存清除失败, key={}", cacheKey, exception);
         }
     }
 
     private String readProfileCacheSafely(Long userId) {
         String cacheKey = buildProfileCacheKey(userId);
         try {
-            String cachedJson = stringRedisTemplate.opsForValue().get(cacheKey);
-            log.info("Profile cache read, key={}, hit={}", cacheKey, cachedJson != null && !cachedJson.isBlank());
-            return cachedJson;
+            return stringRedisTemplate.opsForValue().get(cacheKey);
         } catch (RedisSystemException exception) {
-            log.error("Profile cache read failed, key={}", cacheKey, exception);
+            log.error("用户资料缓存读取失败, key={}", cacheKey, exception);
             evictProfileCache(userId);
             return null;
         } catch (RuntimeException exception) {
-            log.error("Profile cache unexpected read failure, key={}", cacheKey, exception);
+            log.error("用户资料缓存读取过程中发生未知异常, key={}", cacheKey, exception);
             return null;
         }
     }

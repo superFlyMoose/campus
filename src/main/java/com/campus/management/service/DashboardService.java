@@ -16,13 +16,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DashboardService {
-
+    private static final Logger log = LoggerFactory.getLogger(DashboardService.class);
     private static final String SUMMARY_CACHE_KEY = "dashboard:summary";
     private static final String HOT_ACTIVITY_CACHE_KEY = "dashboard:hotActivities";
     private static final String CHART_CACHE_KEY = "dashboard:chartData";
@@ -148,6 +151,7 @@ public class DashboardService {
         try {
             stringRedisTemplate.opsForValue().set(HOT_ACTIVITY_CACHE_KEY, objectMapper.writeValueAsString(values), CACHE_TTL);
         } catch (JsonProcessingException exception) {
+            log.error("最新活动缓存写入失败，key={}", HOT_ACTIVITY_CACHE_KEY, exception);
             stringRedisTemplate.delete(HOT_ACTIVITY_CACHE_KEY);
         }
     }
@@ -156,6 +160,7 @@ public class DashboardService {
         try {
             return stringRedisTemplate.opsForValue().get(HOT_ACTIVITY_CACHE_KEY);
         } catch (RedisSystemException exception) {
+            log.error("最新活动缓存读取失败，key={}", HOT_ACTIVITY_CACHE_KEY, exception);
             stringRedisTemplate.delete(HOT_ACTIVITY_CACHE_KEY);
             return null;
         }
@@ -167,10 +172,9 @@ public class DashboardService {
                 cachedJson,
                 objectMapper.getTypeFactory().constructCollectionType(List.class, HotActivityCacheItem.class)
             );
-            return items.stream()
-                .map(this::toActivity)
-                .collect(Collectors.toList());
+            return items.stream().map(this::toActivity).collect(Collectors.toList());
         } catch (JsonProcessingException exception) {
+            log.error("最新活动缓存反序列化失败，key={}", HOT_ACTIVITY_CACHE_KEY, exception);
             stringRedisTemplate.delete(HOT_ACTIVITY_CACHE_KEY);
             return Collections.emptyList();
         }
@@ -203,6 +207,7 @@ public class DashboardService {
         try {
             return stringRedisTemplate.opsForValue().get(CHART_CACHE_KEY);
         } catch (RedisSystemException exception) {
+            log.error("图表数据缓存读取失败，key={}", CHART_CACHE_KEY, exception);
             stringRedisTemplate.delete(CHART_CACHE_KEY);
             return null;
         }
@@ -216,6 +221,7 @@ public class DashboardService {
         try {
             stringRedisTemplate.opsForValue().set(CHART_CACHE_KEY, objectMapper.writeValueAsString(cacheData), CACHE_TTL);
         } catch (JsonProcessingException exception) {
+            log.error("图表数据缓存写入失败，key={}", CHART_CACHE_KEY, exception);
             stringRedisTemplate.delete(CHART_CACHE_KEY);
         }
     }
@@ -229,6 +235,7 @@ public class DashboardService {
             chartData.put("registrationCounts", cacheData.getRegistrationCounts() == null ? Collections.emptyList() : cacheData.getRegistrationCounts());
             return chartData;
         } catch (JsonProcessingException exception) {
+            log.error("图表数据缓存反序列化失败，key={}", CHART_CACHE_KEY, exception);
             stringRedisTemplate.delete(CHART_CACHE_KEY);
             return Collections.emptyMap();
         }
@@ -261,6 +268,7 @@ public class DashboardService {
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException exception) {
+            log.warn("缓存数据格式异常，无法转换为Long，value={}", value);
             return 0L;
         }
     }

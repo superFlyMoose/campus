@@ -20,15 +20,18 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
     private final ActivityMessageProducer activityMessageProducer;
     private final DashboardCacheService dashboardCacheService;
     private final ProfileCacheService profileCacheService;
+    private final ActivityCacheService activityCacheService;
 
     public RegistrationService(ActivityService activityService,
                                ActivityMessageProducer activityMessageProducer,
                                DashboardCacheService dashboardCacheService,
-                               ProfileCacheService profileCacheService) {
+                               ProfileCacheService profileCacheService,
+                               ActivityCacheService activityCacheService) {
         this.activityService = activityService;
         this.activityMessageProducer = activityMessageProducer;
         this.dashboardCacheService = dashboardCacheService;
         this.profileCacheService = profileCacheService;
+        this.activityCacheService = activityCacheService;
     }
 
     public List<ActivityRegistration> getMyRegistrations(Long userId) {
@@ -65,6 +68,7 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         activityService.updateById(activity);
         dashboardCacheService.evictDashboardCache();
         profileCacheService.evictProfileCache(currentUser.getId());
+        activityCacheService.evictAllActivityCaches();
         sendRegistrationCreatedMessage(activity, currentUser);
     }
 
@@ -88,6 +92,7 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         activityService.updateById(activity);
         dashboardCacheService.evictDashboardCache();
         profileCacheService.evictProfileCache(currentUser.getId());
+        activityCacheService.evictAllActivityCaches();
     }
 
     private void sendRegistrationCreatedMessage(Activity activity, SysUser currentUser) {

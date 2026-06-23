@@ -3,6 +3,7 @@ package com.campus.management.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.campus.management.dto.ActivityForm;
 import com.campus.management.entity.Activity;
+import com.campus.management.service.ActivityCacheService;
 import com.campus.management.service.ActivityService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -21,9 +22,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ActivityController {
 
     private final ActivityService activityService;
+    private final ActivityCacheService activityCacheService;
 
-    public ActivityController(ActivityService activityService) {
+    public ActivityController(ActivityService activityService, ActivityCacheService activityCacheService) {
         this.activityService = activityService;
+        this.activityCacheService = activityCacheService;
     }
 
     @GetMapping
@@ -31,7 +34,11 @@ public class ActivityController {
                        @RequestParam(defaultValue = "") String location,
                        @RequestParam(defaultValue = "1") int page,
                        Model model) {
-        Page<Activity> pageData = activityService.searchActivities(keyword, location, page, 6);
+        Page<Activity> pageData = activityCacheService.getActivityList(keyword, location, page);
+        if (pageData == null) {
+            pageData = activityService.searchActivities(keyword, location, page, 6);
+            activityCacheService.cacheActivityList(keyword, location, page, pageData);
+        }
         model.addAttribute("pageData", pageData);
         model.addAttribute("keyword", keyword);
         model.addAttribute("location", location);
@@ -40,7 +47,12 @@ public class ActivityController {
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        model.addAttribute("activity", activityService.getActivityOrThrow(id));
+        Activity activity = activityCacheService.getActivityDetail(id);
+        if (activity == null) {
+            activity = activityService.getActivityOrThrow(id);
+            activityCacheService.cacheActivityDetail(activity);
+        }
+        model.addAttribute("activity", activity);
         return "activity/detail";
     }
 

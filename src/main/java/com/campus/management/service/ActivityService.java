@@ -18,10 +18,14 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
 
     private final ActivityMessageProducer activityMessageProducer;
     private final DashboardCacheService dashboardCacheService;
+    private final ActivityCacheService activityCacheService;
 
-    public ActivityService(ActivityMessageProducer activityMessageProducer, DashboardCacheService dashboardCacheService) {
+    public ActivityService(ActivityMessageProducer activityMessageProducer,
+                           DashboardCacheService dashboardCacheService,
+                           ActivityCacheService activityCacheService) {
         this.activityMessageProducer = activityMessageProducer;
         this.dashboardCacheService = dashboardCacheService;
+        this.activityCacheService = activityCacheService;
     }
 
     public Page<Activity> searchActivities(String keyword, String location, int pageNum, int pageSize) {
@@ -68,6 +72,7 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
         activity.setIsDeleted(0);
         save(activity);
         dashboardCacheService.evictDashboardCache();
+        activityCacheService.evictAllActivityCaches();
         sendActivityCreatedMessage(activity);
     }
 
@@ -82,11 +87,13 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
         activity.setMaxPeople(form.getMaxPeople());
         updateById(activity);
         dashboardCacheService.evictDashboardCache();
+        activityCacheService.evictAllActivityCaches();
     }
 
     public void removeActivity(Long id) {
         removeById(id);
         dashboardCacheService.evictDashboardCache();
+        activityCacheService.evictAllActivityCaches();
     }
 
     public boolean canRegister(Activity activity) {
@@ -112,3 +119,4 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
         activityMessageProducer.send(RabbitMqConfig.ACTIVITY_CREATED_ROUTING_KEY, message);
     }
 }
+
