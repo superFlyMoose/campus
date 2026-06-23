@@ -3,6 +3,7 @@ package com.campus.management.controller;
 import com.campus.management.entity.SysFile;
 import com.campus.management.entity.SysUser;
 import com.campus.management.service.FileService;
+import com.campus.management.service.ProfileCacheService;
 import com.campus.management.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -18,10 +19,14 @@ public class FileController {
 
     private final FileService fileService;
     private final UserService userService;
+    private final ProfileCacheService profileCacheService;
 
-    public FileController(FileService fileService, UserService userService) {
+    public FileController(FileService fileService,
+                          UserService userService,
+                          ProfileCacheService profileCacheService) {
         this.fileService = fileService;
         this.userService = userService;
+        this.profileCacheService = profileCacheService;
     }
 
     @PostMapping("/avatar")
@@ -33,6 +38,7 @@ public class FileController {
             SysFile savedFile = fileService.saveFile(file, currentUser.getId(), "avatar");
             currentUser.setAvatar(savedFile.getFilePath());
             userService.updateById(currentUser);
+            profileCacheService.evictProfileCache(currentUser.getId());
             redirectAttributes.addFlashAttribute("successMessage", "头像上传成功");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());

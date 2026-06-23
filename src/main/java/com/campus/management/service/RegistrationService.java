@@ -19,13 +19,16 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
     private final ActivityService activityService;
     private final ActivityMessageProducer activityMessageProducer;
     private final DashboardCacheService dashboardCacheService;
+    private final ProfileCacheService profileCacheService;
 
     public RegistrationService(ActivityService activityService,
                                ActivityMessageProducer activityMessageProducer,
-                               DashboardCacheService dashboardCacheService) {
+                               DashboardCacheService dashboardCacheService,
+                               ProfileCacheService profileCacheService) {
         this.activityService = activityService;
         this.activityMessageProducer = activityMessageProducer;
         this.dashboardCacheService = dashboardCacheService;
+        this.profileCacheService = profileCacheService;
     }
 
     public List<ActivityRegistration> getMyRegistrations(Long userId) {
@@ -50,15 +53,18 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         if (!activityService.canRegister(activity)) {
             throw new IllegalArgumentException("当前活动无法报名");
         }
+
         ActivityRegistration registration = new ActivityRegistration();
         registration.setActivityId(activityId);
         registration.setUserId(currentUser.getId());
         registration.setRegistrationTime(LocalDateTime.now());
         registration.setIsDeleted(0);
         save(registration);
+
         activity.setCurrentPeople(activity.getCurrentPeople() + 1);
         activityService.updateById(activity);
         dashboardCacheService.evictDashboardCache();
+        profileCacheService.evictProfileCache(currentUser.getId());
         sendRegistrationCreatedMessage(activity, currentUser);
     }
 
@@ -72,6 +78,7 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         if (registration == null) {
             throw new IllegalArgumentException("报名记录不存在");
         }
+
         Activity activity = activityService.getActivityOrThrow(registration.getActivityId());
         if (activity.getStartTime() != null && !activity.getStartTime().isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("活动开始后不可取消报名");
@@ -80,6 +87,7 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         activity.setCurrentPeople(Math.max(0, activity.getCurrentPeople() - 1));
         activityService.updateById(activity);
         dashboardCacheService.evictDashboardCache();
+        profileCacheService.evictProfileCache(currentUser.getId());
     }
 
     private void sendRegistrationCreatedMessage(Activity activity, SysUser currentUser) {
@@ -94,3 +102,4 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         activityMessageProducer.send(RabbitMqConfig.REGISTRATION_CREATED_ROUTING_KEY, message);
     }
 }
+

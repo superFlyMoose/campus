@@ -2,11 +2,11 @@ package com.campus.management.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class UserForm {
 
     @NotBlank(message = "用户名不能为空")
