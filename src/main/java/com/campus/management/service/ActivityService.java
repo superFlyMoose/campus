@@ -1,0 +1,90 @@
+package com.campus.management.service;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.campus.management.dto.ActivityForm;
+import com.campus.management.entity.Activity;
+import com.campus.management.mapper.ActivityMapper;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+@Service
+public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
+
+    public Page<Activity> searchActivities(String keyword, String location, int pageNum, int pageSize) {
+        LambdaQueryWrapper<Activity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Activity::getIsDeleted, 0)
+            .like(StringUtils.hasText(keyword), Activity::getTitle, keyword)
+            .like(StringUtils.hasText(location), Activity::getLocation, location)
+            .orderByDesc(Activity::getStartTime);
+        return page(new Page<>(pageNum, pageSize), wrapper);
+    }
+
+    public List<Activity> listLatestActivities(int limit) {
+        return lambdaQuery()
+            .eq(Activity::getIsDeleted, 0)
+            .orderByDesc(Activity::getStartTime)
+            .last("limit " + limit)
+            .list();
+    }
+
+    public long countActiveActivities() {
+        return lambdaQuery().eq(Activity::getIsDeleted, 0).count();
+    }
+
+    public Activity getActivityOrThrow(Long id) {
+        Activity activity = getById(id);
+        if (activity == null || Integer.valueOf(1).equals(activity.getIsDeleted())) {
+            throw new IllegalArgumentException("活动不存在");
+        }
+        return activity;
+    }
+
+    public void createActivity(ActivityForm form) {
+        validateTime(form);
+        Activity activity = new Activity();
+        activity.setTitle(form.getTitle());
+        activity.setContent(form.getContent());
+        activity.setLocation(form.getLocation());
+        activity.setStartTime(form.getStartTime());
+        activity.setEndTime(form.getEndTime());
+        activity.setMaxPeople(form.getMaxPeople());
+        activity.setCurrentPeople(0);
+        activity.setImagePath("");
+        activity.setStatus(0);
+        activity.setIsDeleted(0);
+        save(activity);
+    }
+
+    public void updateActivity(Long id, ActivityForm form) {
+        validateTime(form);
+        Activity activity = getActivityOrThrow(id);
+        activity.setTitle(form.getTitle());
+        activity.setContent(form.getContent());
+        activity.setLocation(form.getLocation());
+        activity.setStartTime(form.getStartTime());
+        activity.setEndTime(form.getEndTime());
+        activity.setMaxPeople(form.getMaxPeople());
+        updateById(activity);
+    }
+
+    public void removeActivity(Long id) {
+        removeById(id);
+    }
+
+    public boolean canRegister(Activity activity) {
+        return activity.getStartTime() != null
+            && activity.getStartTime().isAfter(LocalDateTime.now())
+            && activity.getCurrentPeople() < activity.getMaxPeople();
+    }
+
+    private void validateTime(ActivityForm form) {
+        if (form.getStartTime() != null && form.getEndTime() != null
+            && !form.getEndTime().isAfter(form.getStartTime())) {
+            throw new IllegalArgumentException("结束时间必须晚于开始时间");
+        }
+    }
+}

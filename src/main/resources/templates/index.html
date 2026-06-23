@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园活动管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}" th:text="${systemName}">校园活动管理系统</a>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-light btn-sm" th:href="@{/activities}">活动大厅</a>
+            <a class="btn btn-outline-light btn-sm" th:href="@{/user/profile}" th:if="${#authorization.expression('isAuthenticated()')}">个人中心</a>
+            <a class="btn btn-outline-light btn-sm" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">管理端</a>
+            <a class="btn btn-light btn-sm" th:href="@{/login}" th:if="${#authorization.expression('isAnonymous()')}">登录</a>
+            <form th:action="@{/logout}" method="post" class="d-inline" th:if="${#authorization.expression('isAuthenticated()')}">
+                <button type="submit" class="btn btn-light btn-sm">退出登录</button>
+            </form>
+        </div>
+    </div>
+</nav>
+<div class="container py-5">
+    <div class="alert alert-warning" th:if="${param.denied}">
+        您当前没有管理端访问权限。
+    </div>
+    <div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
+        <div class="container-fluid py-3">
+            <h1 class="display-6 fw-bold">校园活动管理系统</h1>
+            <p class="col-md-8 fs-5 text-secondary">第一时间获取校园最新活动</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-primary btn-lg" th:href="@{/activities}">浏览活动</a>
+                <a class="btn btn-outline-primary btn-lg" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">管理端</a>
+                <button type="button" class="btn btn-outline-secondary btn-lg" th:if="${!#authorization.expression('hasRole(''ADMIN'')')}" onclick="alert('您当前没有管理端访问权限');">管理端</button>
+            </div>
+        </div>
+    </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">最新活动</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3" th:if="${!#lists.isEmpty(hotActivities)}">
+                <div class="col-md-6 col-lg-4" th:each="activity : ${hotActivities}">
+                    <div class="border rounded p-3 h-100">
+                        <h5 th:text="${activity.title}">活动标题</h5>
+                        <p class="text-secondary mb-2" th:text="${activity.location}">活动地点</p>
+                        <p class="small text-secondary mb-3" th:text="${#temporals.format(activity.startTime, 'yyyy-MM-dd HH:mm')}">开始时间</p>
+                        <a class="btn btn-sm btn-primary" th:href="@{|/activities/${activity.id}|}">查看详情</a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-secondary" th:if="${#lists.isEmpty(hotActivities)}">暂无活动数据，请先在管理端创建活动。</div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4" th:each="entry : ${summary}">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary" th:text="${entry.key}">统计项</h5>
+                    <p class="display-6 mb-0" th:text="${entry.value}">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">近 7 天活动趋势</h5>
+        </div>
+        <div class="card-body" style="height: 320px;">
+            <canvas id="dashboardChart"></canvas>
+        </div>
+    </div>
+
+</div>
+<script th:inline="javascript">
+    const chartData = /*[[${chartData}]]*/ {};
+    const canvas = document.getElementById('dashboardChart');
+    if (canvas && chartData.labels) {
+        new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [
+                    {
+                        label: '新增活动',
+                        data: chartData.activityCounts,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.12)',
+                        fill: true,
+                        tension: 0.35
+                    },
+                    {
+                        label: '新增报名',
+                        data: chartData.registrationCounts,
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.12)',
+                        fill: true,
+                        tension: 0.35
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>
+
+
+
+
