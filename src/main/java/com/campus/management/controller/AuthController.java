@@ -15,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AuthController {
-
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 

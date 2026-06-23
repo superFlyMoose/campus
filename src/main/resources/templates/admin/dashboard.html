@@ -19,7 +19,6 @@
             text-decoration: none;
             transition: all 0.2s ease;
         }
-
         .admin-nav-link.active,
         .admin-nav-link:hover {
             background-color: #0d6efd;
@@ -58,11 +57,9 @@
             <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div th:if="${activeTab == 'users'}">
                     <h2 class="mb-1">用户管理</h2>
-                    <p class="text-secondary mb-0">左侧切换功能模块，右侧展示当前管理内容。</p>
                 </div>
                 <div th:if="${activeTab != 'users'}">
                     <h2 class="mb-1">活动管理</h2>
-                    <p class="text-secondary mb-0">左侧切换功能模块，右侧展示当前管理内容。</p>
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
                     <a th:if="${activeTab == 'users'}" th:href="@{/admin/users/create}" class="btn btn-primary">新增用户</a>

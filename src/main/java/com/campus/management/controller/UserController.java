@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class UserController {
-
     private final UserService userService;
     private final RegistrationService registrationService;
     private final ProfileCacheService profileCacheService;

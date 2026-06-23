@@ -16,7 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/files")
 public class FileController {
-
     private final FileService fileService;
     private final UserService userService;
     private final ProfileCacheService profileCacheService;

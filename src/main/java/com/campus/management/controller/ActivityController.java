@@ -20,7 +20,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/activities")
 public class ActivityController {
-
     private final ActivityService activityService;
     private final ActivityCacheService activityCacheService;
 

@@ -20,7 +20,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AdminController {
-
     private final UserService userService;
     private final ActivityService activityService;
     private final PasswordEncoder passwordEncoder;

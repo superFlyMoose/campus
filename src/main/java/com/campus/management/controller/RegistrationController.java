@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/registrations")
 public class RegistrationController {
-
     private final RegistrationService registrationService;
     private final UserService userService;
 
