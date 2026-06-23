@@ -34,11 +34,7 @@ public class DashboardService {
     private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
 
-    public DashboardService(UserService userService,
-                            ActivityService activityService,
-                            RegistrationService registrationService,
-                            StringRedisTemplate stringRedisTemplate,
-                            ObjectMapper objectMapper) {
+    public DashboardService(UserService userService, ActivityService activityService, RegistrationService registrationService, StringRedisTemplate stringRedisTemplate, ObjectMapper objectMapper) {
         this.userService = userService;
         this.activityService = activityService;
         this.registrationService = registrationService;
