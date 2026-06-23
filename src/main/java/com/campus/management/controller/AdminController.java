@@ -2,7 +2,9 @@ package com.campus.management.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.campus.management.dto.UserForm;
+import com.campus.management.entity.Activity;
 import com.campus.management.entity.SysUser;
+import com.campus.management.service.ActivityService;
 import com.campus.management.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,23 +22,36 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AdminController {
 
     private final UserService userService;
+    private final ActivityService activityService;
     private final PasswordEncoder passwordEncoder;
 
-    public AdminController(UserService userService, PasswordEncoder passwordEncoder) {
+    public AdminController(UserService userService,
+                           ActivityService activityService,
+                           PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.activityService = activityService;
         this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/admin/dashboard")
-    public String dashboard() {
+    public String dashboard(@RequestParam(defaultValue = "activity") String tab,
+                            @RequestParam(defaultValue = "1") int page,
+                            Model model) {
+        model.addAttribute("activeTab", tab);
+        if ("users".equals(tab)) {
+            Page<SysUser> userPage = userService.pageUsers(page, 10);
+            model.addAttribute("userPage", userPage);
+        } else {
+            Page<Activity> activityPage = activityService.searchActivities("", "", page, 8);
+            model.addAttribute("activityPage", activityPage);
+            model.addAttribute("activeTab", "activity");
+        }
         return "admin/dashboard";
     }
 
     @GetMapping("/admin/users")
-    public String users(@RequestParam(defaultValue = "1") int page, Model model) {
-        Page<SysUser> pageData = userService.pageUsers(page, 10);
-        model.addAttribute("pageData", pageData);
-        return "admin/user-list";
+    public String users(@RequestParam(defaultValue = "1") int page) {
+        return "redirect:/admin/dashboard?tab=users&page=" + page;
     }
 
     @GetMapping("/admin/users/create")
@@ -75,7 +90,7 @@ public class AdminController {
             return "admin/user-form";
         }
         redirectAttributes.addFlashAttribute("successMessage", "用户创建成功");
-        return "redirect:/admin/users";
+        return "redirect:/admin/dashboard?tab=users";
     }
 
     @GetMapping("/admin/users/{id}/edit")
@@ -121,13 +136,13 @@ public class AdminController {
             return "admin/user-form";
         }
         redirectAttributes.addFlashAttribute("successMessage", "用户更新成功");
-        return "redirect:/admin/users";
+        return "redirect:/admin/dashboard?tab=users";
     }
 
     @PostMapping("/admin/users/{id}/delete")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         userService.removeById(id);
         redirectAttributes.addFlashAttribute("successMessage", "用户删除成功");
-        return "redirect:/admin/users";
+        return "redirect:/admin/dashboard?tab=users";
     }
 }

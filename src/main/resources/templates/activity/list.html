@@ -10,9 +10,10 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">活动大厅</h2>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
             <a th:href="@{/}" class="btn btn-outline-secondary">首页</a>
-            <a th:href="@{/activities/admin/create}" class="btn btn-primary">发布活动</a>
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline-dark" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">管理端</a>
+            <a th:href="@{/activities/admin/create}" class="btn btn-primary" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">发布活动</a>
         </div>
     </div>
     <div class="card border-0 shadow-sm mb-4">
@@ -39,9 +40,14 @@
                     <p class="text-secondary mb-2" th:text="${activity.location}">地点</p>
                     <p class="small text-secondary" th:text="${#temporals.format(activity.startTime, 'yyyy-MM-dd HH:mm')} + ' 开始'">时间</p>
                     <p class="small text-secondary">报名人数：<span th:text="${activity.currentPeople}">0</span>/<span th:text="${activity.maxPeople}">0</span></p>
-                    <div class="mt-auto d-flex gap-2">
+                    <div class="mt-auto d-flex gap-2 flex-wrap">
                         <a class="btn btn-sm btn-primary" th:href="@{|/activities/${activity.id}|}">查看详情</a>
-                        <a class="btn btn-sm btn-outline-secondary" th:href="@{|/activities/admin/${activity.id}/edit|}">编辑</a>
+                        <div class="d-flex gap-2 flex-wrap" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                            <a class="btn btn-sm btn-outline-secondary" th:href="@{|/activities/admin/${activity.id}/edit|}">编辑</a>
+                            <form th:action="@{|/activities/admin/${activity.id}/delete|}" method="post" onsubmit="return confirm('确认删除该活动吗？');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">删除</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -51,3 +57,5 @@
 </div>
 </body>
 </html>
+
+
