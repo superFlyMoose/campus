@@ -10,12 +10,22 @@ import org.springframework.util.StringUtils;
 @Service
 public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
 
+    private final ProfileCacheService profileCacheService;
+    private final DashboardCacheService dashboardCacheService;
+
+    public UserService(ProfileCacheService profileCacheService,
+                       DashboardCacheService dashboardCacheService) {
+        this.profileCacheService = profileCacheService;
+        this.dashboardCacheService = dashboardCacheService;
+    }
+
     public void register(SysUser user) {
         validateUsernameUnique(user.getUsername(), null);
         user.setRole("USER");
         user.setAvatar(user.getAvatar() == null ? "" : user.getAvatar());
         user.setIsDeleted(0);
         save(user);
+        dashboardCacheService.evictDashboardCache();
     }
 
     public Page<SysUser> pageUsers(int pageNum, int pageSize) {
@@ -30,6 +40,7 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
         user.setAvatar(user.getAvatar() == null ? "" : user.getAvatar());
         user.setIsDeleted(0);
         save(user);
+        dashboardCacheService.evictDashboardCache();
     }
 
     public void updateUser(Long id, SysUser updatedUser) {
@@ -45,6 +56,14 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
             existingUser.setPassword(updatedUser.getPassword());
         }
         updateById(existingUser);
+        profileCacheService.evictProfileCache(id);
+        dashboardCacheService.evictDashboardCache();
+    }
+
+    public void deleteUser(Long id) {
+        removeById(id);
+        profileCacheService.evictProfileCache(id);
+        dashboardCacheService.evictDashboardCache();
     }
 
     public SysUser findByUsername(String username) {
@@ -64,3 +83,4 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
         }
     }
 }
+

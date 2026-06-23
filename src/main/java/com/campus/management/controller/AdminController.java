@@ -140,7 +140,7 @@ public class AdminController {
 
     @PostMapping("/admin/users/{id}/delete")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        userService.removeById(id);
+        userService.deleteUser(id);
         redirectAttributes.addFlashAttribute("successMessage", "用户删除成功");
         return "redirect:/admin/dashboard?tab=users";
     }
