@@ -5,55 +5,244 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle}">活动表单</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: #4f46e5;
+            --brand-primary-dark: #3730a3;
+            --brand-accent: #14b8a6;
+            --text-strong: #0f172a;
+            --text-muted: #64748b;
+            --line-soft: rgba(99, 102, 241, 0.14);
+            --surface: rgba(255,255,255,0.9);
+            --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.08);
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 30%),
+                radial-gradient(circle at top right, rgba(20, 184, 166, 0.12), transparent 26%),
+                linear-gradient(180deg, #f8faff 0%, #eef3ff 54%, #f8fafc 100%);
+            color: var(--text-strong);
+        }
+
+        .page-shell,
+        .form-shell,
+        .group-shell {
+            border-radius: 28px;
+            border: 1px solid rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.4);
+            padding: 0.65rem;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .page-panel,
+        .form-panel,
+        .group-panel {
+            border-radius: 22px;
+            border: 1px solid var(--line-soft);
+            background: var(--surface);
+        }
+
+        .page-panel {
+            padding: 2.2rem;
+            background:
+                radial-gradient(circle at top right, rgba(255,255,255,0.14), transparent 28%),
+                linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(79, 70, 229, 0.92));
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-panel::after {
+            content: "";
+            position: absolute;
+            inset: auto -10% -20% auto;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 68%);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.42rem 0.8rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.08);
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 1rem;
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            line-height: 1.08;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .page-copy {
+            color: rgba(255,255,255,0.76);
+            max-width: 640px;
+            margin-bottom: 0;
+        }
+
+        .form-panel {
+            padding: 1.75rem;
+        }
+
+        .group-panel {
+            padding: 1.35rem;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,242,255,0.84));
+        }
+
+        .group-title {
+            font-size: 1.08rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .group-copy {
+            color: var(--text-muted);
+            margin-bottom: 1.1rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+        }
+
+        .form-control {
+            min-height: 52px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            box-shadow: none;
+            padding: 0.9rem 1rem;
+        }
+
+        textarea.form-control {
+            min-height: 180px;
+            resize: vertical;
+        }
+
+        .form-control:focus {
+            border-color: rgba(79, 70, 229, 0.45);
+            box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.12);
+        }
+
+        .btn-pill {
+            border-radius: 999px;
+            padding: 0.85rem 1.25rem;
+            font-weight: 700;
+        }
+
+        .btn-premium {
+            border: none;
+            background: linear-gradient(135deg, var(--brand-primary), #7c3aed);
+            box-shadow: 0 16px 26px rgba(79, 70, 229, 0.24);
+        }
+
+        .btn-premium:hover,
+        .btn-premium:focus {
+            background: linear-gradient(135deg, var(--brand-primary-dark), #6d28d9);
+        }
+
+        .text-danger.small {
+            margin-top: 0.45rem !important;
+        }
+
+        @media (max-width: 767.98px) {
+            .page-panel,
+            .form-panel,
+            .group-panel {
+                padding: 1.35rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container py-4">
+<body>
+<div class="container py-4 py-lg-5">
+    <section class="page-shell mb-4">
+        <div class="page-panel">
+            <span class="eyebrow">Activity Editor</span>
+            <h1 class="page-title" th:text="${pageTitle}">活动表单</h1>
+            <p class="page-copy">在不改变现有业务逻辑的前提下，对活动名称、时间、地点、人数与内容进行完整维护。</p>
+        </div>
+    </section>
+
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h3 class="mb-4" th:text="${pageTitle}">活动表单</h3>
-                    <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}">错误</div>
+        <div class="col-xl-9">
+            <section class="form-shell">
+                <div class="form-panel">
+                    <div class="alert alert-danger border-0 rounded-4" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}">错误</div>
                     <form th:action="${formAction}" th:object="${activityForm}" method="post">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">活动名称</label>
-                                <input type="text" th:field="*{title}" class="form-control">
-                                <div class="text-danger small mt-1" th:errors="*{title}"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">活动地点</label>
-                                <input type="text" th:field="*{location}" class="form-control">
-                                <div class="text-danger small mt-1" th:errors="*{location}"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">开始时间</label>
-                                <input type="datetime-local" th:field="*{startTime}" class="form-control">
-                                <div class="text-danger small mt-1" th:errors="*{startTime}"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">结束时间</label>
-                                <input type="datetime-local" th:field="*{endTime}" class="form-control">
-                                <div class="text-danger small mt-1" th:errors="*{endTime}"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">人数上限</label>
-                                <input type="number" th:field="*{maxPeople}" class="form-control">
-                                <div class="text-danger small mt-1" th:errors="*{maxPeople}"></div>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">活动内容</label>
-                                <textarea th:field="*{content}" rows="6" class="form-control"></textarea>
-                                <div class="text-danger small mt-1" th:errors="*{content}"></div>
+                        <div class="group-shell mb-3">
+                            <div class="group-panel">
+                                <div class="group-title">基础信息</div>
+                                <div class="group-copy">设置活动最核心的标题与地点信息，确保用户能快速识别活动内容。</div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">活动名称</label>
+                                        <input type="text" th:field="*{title}" class="form-control">
+                                        <div class="text-danger small mt-1" th:errors="*{title}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">活动地点</label>
+                                        <input type="text" th:field="*{location}" class="form-control">
+                                        <div class="text-danger small mt-1" th:errors="*{location}"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between mt-4">
-                            <a th:href="@{/activities}" class="btn btn-outline-secondary">返回列表</a>
-                            <button type="submit" class="btn btn-primary">保存</button>
+
+                        <div class="group-shell mb-3">
+                            <div class="group-panel">
+                                <div class="group-title">时间与容量</div>
+                                <div class="group-copy">明确活动开始、结束时间以及人数上限，帮助系统按当前逻辑进行报名控制。</div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">开始时间</label>
+                                        <input type="datetime-local" th:field="*{startTime}" class="form-control">
+                                        <div class="text-danger small mt-1" th:errors="*{startTime}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">结束时间</label>
+                                        <input type="datetime-local" th:field="*{endTime}" class="form-control">
+                                        <div class="text-danger small mt-1" th:errors="*{endTime}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">人数上限</label>
+                                        <input type="number" th:field="*{maxPeople}" class="form-control">
+                                        <div class="text-danger small mt-1" th:errors="*{maxPeople}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="group-shell mb-4">
+                            <div class="group-panel">
+                                <div class="group-title">活动内容</div>
+                                <div class="group-copy">详细描述活动流程、参与方式与注意事项，提升用户在详情页中的阅读体验。</div>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">活动内容</label>
+                                        <textarea th:field="*{content}" rows="6" class="form-control"></textarea>
+                                        <div class="text-danger small mt-1" th:errors="*{content}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-3">
+                            <a th:href="@{/activities}" class="btn btn-outline-secondary btn-pill">返回列表</a>
+                            <button type="submit" class="btn btn-premium btn-pill text-white">保存</button>
                         </div>
                     </form>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 </div>

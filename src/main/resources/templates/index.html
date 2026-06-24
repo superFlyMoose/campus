@@ -7,68 +7,454 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .hot-activity-card {
-            min-height: 100%;
+        :root {
+            --brand-primary: #4f46e5;
+            --brand-primary-dark: #3730a3;
+            --brand-accent: #14b8a6;
+            --brand-warm: #f97316;
+            --text-strong: #0f172a;
+            --text-muted: #64748b;
+            --surface: rgba(255, 255, 255, 0.88);
+            --surface-strong: #ffffff;
+            --surface-soft: #eef2ff;
+            --line-soft: rgba(99, 102, 241, 0.14);
+            --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.08);
+            --shadow-card: 0 16px 40px rgba(79, 70, 229, 0.10);
+            --radius-xl: 28px;
+            --radius-lg: 22px;
+            --radius-md: 18px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(79, 70, 229, 0.18), transparent 32%),
+                radial-gradient(circle at top right, rgba(20, 184, 166, 0.14), transparent 28%),
+                linear-gradient(180deg, #f8faff 0%, #eef3ff 52%, #f8fafc 100%);
+            color: var(--text-strong);
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 24px 24px;
+            mask-image: radial-gradient(circle at center, black 35%, transparent 82%);
+            opacity: 0.35;
+        }
+
+        .topbar-wrap {
+            padding-top: 1.5rem;
+        }
+
+        .topbar {
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 999px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .nav-action {
+            border-radius: 999px;
+            padding-inline: 1rem;
+        }
+
+        .btn-premium {
+            border: none;
+            border-radius: 999px;
+            padding: 0.85rem 1.4rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--brand-primary), #7c3aed);
+            box-shadow: 0 16px 28px rgba(79, 70, 229, 0.26);
+        }
+
+        .btn-premium:hover,
+        .btn-premium:focus {
+            background: linear-gradient(135deg, var(--brand-primary-dark), #6d28d9);
+        }
+
+        .btn-ghost-light {
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .btn-ghost-light:hover,
+        .btn-ghost-light:focus {
+            color: #fff;
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .hero-shell,
+        .section-shell,
+        .metrics-card,
+        .activity-card,
+        .chart-shell,
+        .cta-shell {
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: var(--radius-xl);
+            background: rgba(255,255,255,0.36);
+            box-shadow: var(--shadow-soft);
+            padding: 0.65rem;
+        }
+
+        .hero-panel,
+        .section-panel,
+        .metrics-panel,
+        .activity-panel,
+        .chart-panel,
+        .cta-panel {
+            border-radius: calc(var(--radius-xl) - 10px);
+            background: var(--surface);
+            border: 1px solid var(--line-soft);
+        }
+
+        .hero-panel {
+            padding: 3rem;
+            background:
+                radial-gradient(circle at top right, rgba(20, 184, 166, 0.16), transparent 28%),
+                radial-gradient(circle at left center, rgba(79, 70, 229, 0.18), transparent 35%),
+                linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.94));
+            color: #fff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-panel::after {
+            content: "";
+            position: absolute;
+            inset: auto -8% -18% auto;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 65%);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.85rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.16);
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.86);
+        }
+
+        .hero-title {
+            max-width: 760px;
+            font-size: clamp(2.6rem, 4vw, 4.4rem);
+            line-height: 1.08;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero-copy {
+            max-width: 620px;
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.78);
+            margin-bottom: 1.75rem;
+        }
+
+        .hero-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .hero-stat {
+            padding: 1rem 1.1rem;
+            border-radius: 22px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .hero-stat-label {
+            display: block;
+            color: rgba(255,255,255,0.72);
+            font-size: 0.84rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .hero-stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .section-panel,
+        .chart-panel,
+        .cta-panel {
+            padding: 1.75rem;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-kicker {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--brand-primary);
+            font-weight: 700;
+            margin-bottom: 0.55rem;
+        }
+
+        .section-title {
+            font-size: 1.55rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .section-copy {
+            color: var(--text-muted);
+            margin-bottom: 0;
+        }
+
+        .activity-panel {
+            padding: 1.5rem;
+            height: 100%;
+            transition: transform 0.35s ease, box-shadow 0.35s ease;
+            box-shadow: var(--shadow-card);
+        }
+
+        .activity-panel:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 26px 50px rgba(79, 70, 229, 0.16);
+        }
+
+        .activity-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.4rem 0.75rem;
+            background: rgba(79, 70, 229, 0.10);
+            color: var(--brand-primary);
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .activity-meta {
+            display: grid;
+            gap: 0.55rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metrics-panel {
+            padding: 1.5rem;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(238,242,255,0.88));
+        }
+
+        .metrics-label {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .metrics-value {
+            font-size: clamp(2rem, 3vw, 2.6rem);
+            font-weight: 700;
+            margin-bottom: 0.45rem;
+        }
+
+        .metrics-note {
+            color: var(--brand-accent);
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .chart-panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(248,250,255,0.92));
+        }
+
+        .chart-wrap {
+            height: 340px;
+        }
+
+        .cta-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.96), rgba(20, 184, 166, 0.92));
+            color: #fff;
+        }
+
+        .cta-panel p {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 0;
+        }
+
+        .cta-btn-light {
+            border-radius: 999px;
+            padding: 0.85rem 1.4rem;
+            font-weight: 700;
         }
 
         .hot-activity-carousel .carousel-control-prev,
         .hot-activity-carousel .carousel-control-next {
-            width: 3rem;
+            width: 3.2rem;
         }
 
         .hot-activity-carousel .carousel-control-prev-icon,
         .hot-activity-carousel .carousel-control-next-icon {
-            background-color: rgba(13, 110, 253, 0.85);
+            width: 2.8rem;
+            height: 2.8rem;
             border-radius: 50%;
-            background-size: 55% 55%;
+            background-color: rgba(15, 23, 42, 0.86);
+            background-size: 45% 45%;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.22);
+        }
+
+        @media (max-width: 991.98px) {
+            .topbar {
+                border-radius: 28px;
+            }
+
+            .hero-panel {
+                padding: 2rem;
+            }
+
+            .hero-stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-panel {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .topbar-wrap {
+                padding-top: 1rem;
+            }
+
+            .hero-panel,
+            .section-panel,
+            .chart-panel,
+            .cta-panel {
+                padding: 1.5rem;
+            }
+
+            .section-heading {
+                flex-direction: column;
+            }
+
+            .chart-wrap {
+                height: 280px;
+            }
         }
     </style>
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/}" th:text="${systemName}">校园活动管理系统</a>
-        <div class="d-flex gap-2">
-            <a class="btn btn-outline-light btn-sm" th:href="@{/activities}">活动大厅</a>
-            <a class="btn btn-outline-light btn-sm" th:href="@{/user/profile}" th:if="${#authorization.expression('isAuthenticated()')}">个人中心</a>
-            <a class="btn btn-outline-light btn-sm" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">管理端</a>
-            <a class="btn btn-light btn-sm" th:href="@{/login}" th:if="${#authorization.expression('isAnonymous()')}">登录</a>
-            <form th:action="@{/logout}" method="post" class="d-inline" th:if="${#authorization.expression('isAuthenticated()')}">
-                <button type="submit" class="btn btn-light btn-sm">退出登录</button>
-            </form>
-        </div>
-    </div>
-</nav>
-<div class="container py-5">
-    <div class="alert alert-warning" th:if="${param.denied}">
-        您当前没有管理端访问权限。
-    </div>
-    <div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
-        <div class="container-fluid py-3">
-            <h1 class="display-6 fw-bold">校园活动管理系统</h1>
-            <p class="col-md-8 fs-5 text-secondary">第一时间获取校园最新活动</p>
-            <div class="d-flex gap-2 flex-wrap">
-                <a class="btn btn-primary btn-lg" th:href="@{/activities}">浏览活动</a>
-                <a class="btn btn-outline-primary btn-lg" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">管理端</a>
-                <button type="button" class="btn btn-outline-secondary btn-lg" th:if="${!#authorization.expression('hasRole(''ADMIN'')')}" onclick="alert('您当前没有管理端访问权限');">管理端</button>
+<body>
+<div class="container topbar-wrap">
+    <nav class="navbar navbar-expand-lg topbar">
+        <div class="container-fluid px-0">
+            <a class="navbar-brand text-white" th:href="@{/}" th:text="${systemName}">校园活动管理系统</a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="切换导航">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse mt-3 mt-lg-0" id="mainNav">
+                <div class="ms-lg-auto d-flex flex-column flex-lg-row gap-2 align-items-lg-center">
+                    <a class="btn btn-ghost-light nav-action" th:href="@{/activities}">活动大厅</a>
+                    <a class="btn btn-ghost-light nav-action" th:href="@{/user/profile}" th:if="${#authorization.expression('isAuthenticated()')}">个人中心</a>
+                    <a class="btn btn-ghost-light nav-action" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">管理端</a>
+                    <a class="btn btn-light nav-action" th:href="@{/login}" th:if="${#authorization.expression('isAnonymous()')}">登录</a>
+                    <form th:action="@{/logout}" method="post" class="d-inline" th:if="${#authorization.expression('isAuthenticated()')}">
+                        <button type="submit" class="btn btn-light nav-action">退出登录</button>
+                    </form>
+                </div>
             </div>
         </div>
+    </nav>
+</div>
+
+<div class="container py-4 py-lg-5">
+    <div class="alert alert-warning border-0 shadow-sm rounded-4" th:if="${param.denied}">
+        您当前没有管理端访问权限。
     </div>
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white">
-            <h5 class="mb-0">最新活动</h5>
+
+    <section class="hero-shell mb-4 mb-lg-5">
+        <div class="hero-panel">
+            <span class="eyebrow">Campus Activity Platform</span>
+            <div class="row align-items-center g-4 position-relative" style="z-index: 1;">
+                <div class="col-lg-7">
+                    <h1 class="hero-title">把校园里的每一次参与、组织与发现，汇聚成清晰而有温度的活动体验。</h1>
+                    <p class="hero-copy">从热门活动浏览、即时报名到数据趋势洞察，这里为学生与管理者提供统一、直观且更具现代感的校园活动操作入口。</p>
+                    <div class="d-flex flex-column flex-sm-row gap-3">
+                        <a class="btn btn-light btn-lg cta-btn-light" th:href="@{/activities}">浏览活动</a>
+                        <a class="btn btn-outline-light btn-lg rounded-pill px-4" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">进入管理端</a>
+                        <button type="button" class="btn btn-outline-light btn-lg rounded-pill px-4" th:if="${!#authorization.expression('hasRole(''ADMIN'')')}" onclick="alert('您当前没有管理端访问权限');">查看管理端</button>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="hero-stat-grid">
+                        <div class="hero-stat" th:each="entry : ${summary}">
+                            <span class="hero-stat-label" th:text="${entry.key}">统计项</span>
+                            <span class="hero-stat-value" th:text="${entry.value}">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
+    </section>
+
+    <section class="section-shell mb-4">
+        <div class="section-panel">
+            <div class="section-heading">
+                <div>
+                    <div class="section-kicker">精选推荐</div>
+                    <h2 class="section-title mb-2">最新活动</h2>
+                    <p class="section-copy">浏览当前最值得关注的校园活动，快速锁定正在发生的校园热点。</p>
+                </div>
+                <a class="btn btn-outline-primary rounded-pill px-4" th:href="@{/activities}">进入活动大厅</a>
+            </div>
             <div id="hotActivityCarousel" class="carousel slide hot-activity-carousel" data-bs-ride="false" th:if="${!#lists.isEmpty(hotActivities)}">
                 <div class="carousel-inner">
                     <div class="carousel-item" th:each="pageIndex : ${#numbers.sequence(0, (hotActivities.size() - 1) / 3)}" th:classappend="${pageIndex == 0} ? ' active'">
-                        <div class="row g-3 px-md-5 px-4">
+                        <div class="row g-3 g-lg-4 px-lg-4">
                             <div class="col-md-4" th:each="itemIndex : ${#numbers.sequence(pageIndex * 3, T(java.lang.Math).min(pageIndex * 3 + 2, hotActivities.size() - 1))}">
-                                <div class="border rounded p-3 hot-activity-card bg-light h-100">
-                                    <h5 th:text="${hotActivities[itemIndex].title}">活动标题</h5>
-                                    <p class="text-secondary mb-2" th:text="${hotActivities[itemIndex].location}">活动地点</p>
-                                    <p class="small text-secondary mb-3" th:text="${#temporals.format(hotActivities[itemIndex].startTime, 'yyyy-MM-dd HH:mm')}">开始时间</p>
-                                    <a class="btn btn-sm btn-primary" th:href="@{|/activities/${hotActivities[itemIndex].id}|}">查看详情</a>
+                                <div class="activity-card h-100">
+                                    <div class="activity-panel d-flex flex-column">
+                                        <span class="activity-badge">热门活动</span>
+                                        <h5 class="fw-bold mb-3" th:text="${hotActivities[itemIndex].title}">活动标题</h5>
+                                        <div class="activity-meta">
+                                            <div>地点：<span th:text="${hotActivities[itemIndex].location}">活动地点</span></div>
+                                            <div>开始时间：<span th:text="${#temporals.format(hotActivities[itemIndex].startTime, 'yyyy-MM-dd HH:mm')}">开始时间</span></div>
+                                        </div>
+                                        <div class="mt-auto">
+                                            <a class="btn btn-premium text-white w-100" th:href="@{|/activities/${hotActivities[itemIndex].id}|}">查看详情</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -83,32 +469,65 @@
                     <span class="visually-hidden">下一页</span>
                 </button>
             </div>
-            <div class="text-secondary" th:if="${#lists.isEmpty(hotActivities)}">暂无活动数据，请先在管理端创建活动。</div>
+            <div class="text-secondary fs-6" th:if="${#lists.isEmpty(hotActivities)}">暂无活动数据，请先在管理端创建活动。</div>
         </div>
-    </div>
-    <div class="row g-4 mb-4">
+    </section>
+
+    <section class="row g-4 mb-4">
         <div class="col-md-4" th:each="entry : ${summary}">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-secondary" th:text="${entry.key}">统计项</h5>
-                    <p class="display-6 mb-0" th:text="${entry.value}">0</p>
+            <div class="metrics-card h-100">
+                <div class="metrics-panel">
+                    <div class="metrics-label" th:text="${entry.key}">统计项</div>
+                    <div class="metrics-value" th:text="${entry.value}">0</div>
+                    <p class="metrics-note">持续关注校园参与热度与活动组织节奏</p>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white">
-            <h5 class="mb-0">近 7 天活动趋势</h5>
+    </section>
+
+    <section class="chart-shell mb-4">
+        <div class="chart-panel">
+            <div class="section-heading">
+                <div>
+                    <div class="section-kicker">趋势洞察</div>
+                    <h2 class="section-title mb-2">近 7 天活动趋势</h2>
+                    <p class="section-copy">结合活动发布与报名增长，快速查看近期校园活动活跃度变化。</p>
+                </div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="dashboardChart"></canvas>
+            </div>
         </div>
-        <div class="card-body" style="height: 320px;">
-            <canvas id="dashboardChart"></canvas>
+    </section>
+
+    <section class="cta-shell">
+        <div class="cta-panel">
+            <div>
+                <div class="section-kicker text-white-50 mb-2">快速入口</div>
+                <h2 class="h3 fw-bold mb-2">让发现活动、参与活动与管理活动形成一条流畅路径。</h2>
+                <p>无论你是学生参与者，还是活动组织者，都可以从统一入口高效完成自己的任务。</p>
+            </div>
+            <div class="d-flex flex-column flex-sm-row gap-3 w-100 w-lg-auto">
+                <a class="btn btn-light cta-btn-light" th:href="@{/activities}">查看所有活动</a>
+                <a class="btn btn-outline-light rounded-pill px-4" th:href="@{/user/profile}" th:if="${#authorization.expression('isAuthenticated()')}">进入个人中心</a>
+            </div>
         </div>
-    </div>
+    </section>
 </div>
+
 <script th:inline="javascript">
     const chartData = /*[[${chartData}]]*/ {};
     const canvas = document.getElementById('dashboardChart');
     if (canvas && chartData.labels) {
+        const context = canvas.getContext('2d');
+        const gradientActivity = context.createLinearGradient(0, 0, 0, 320);
+        gradientActivity.addColorStop(0, 'rgba(79, 70, 229, 0.28)');
+        gradientActivity.addColorStop(1, 'rgba(79, 70, 229, 0.02)');
+
+        const gradientRegistration = context.createLinearGradient(0, 0, 0, 320);
+        gradientRegistration.addColorStop(0, 'rgba(20, 184, 166, 0.24)');
+        gradientRegistration.addColorStop(1, 'rgba(20, 184, 166, 0.02)');
+
         new Chart(canvas, {
             type: 'line',
             data: {
@@ -117,29 +536,64 @@
                     {
                         label: '新增活动',
                         data: chartData.activityCounts,
-                        borderColor: '#0d6efd',
-                        backgroundColor: 'rgba(13, 110, 253, 0.12)',
+                        borderColor: '#4f46e5',
+                        backgroundColor: gradientActivity,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#4f46e5',
                         fill: true,
-                        tension: 0.35
+                        tension: 0.38
                     },
                     {
                         label: '新增报名',
                         data: chartData.registrationCounts,
-                        borderColor: '#198754',
-                        backgroundColor: 'rgba(25, 135, 84, 0.12)',
+                        borderColor: '#14b8a6',
+                        backgroundColor: gradientRegistration,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#14b8a6',
                         fill: true,
-                        tension: 0.35
+                        tension: 0.38
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            color: '#334155',
+                            padding: 18
+                        }
+                    }
+                },
                 scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b'
+                        }
+                    },
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            precision: 0
+                            precision: 0,
+                            color: '#64748b'
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.16)'
                         }
                     }
                 }
@@ -150,9 +604,3 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-
-
-
-

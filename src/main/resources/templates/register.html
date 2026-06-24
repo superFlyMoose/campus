@@ -5,43 +5,310 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>用户注册</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: #4f46e5;
+            --brand-primary-dark: #3730a3;
+            --brand-accent: #14b8a6;
+            --text-strong: #0f172a;
+            --text-muted: #64748b;
+            --line-soft: rgba(99, 102, 241, 0.14);
+            --shadow-soft: 0 28px 80px rgba(15, 23, 42, 0.16);
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(79, 70, 229, 0.22), transparent 34%),
+                radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.18), transparent 28%),
+                linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+            color: var(--text-strong);
+        }
+
+        .auth-layout {
+            min-height: 100vh;
+            padding: 2rem 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .auth-shell {
+            border-radius: 34px;
+            border: 1px solid rgba(255,255,255,0.92);
+            background: rgba(255,255,255,0.42);
+            padding: 0.75rem;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .auth-panel,
+        .brand-panel {
+            border-radius: 28px;
+            height: 100%;
+        }
+
+        .auth-panel {
+            background: rgba(255,255,255,0.95);
+            border: 1px solid var(--line-soft);
+            padding: 2.4rem;
+        }
+
+        .brand-panel {
+            background:
+                radial-gradient(circle at top right, rgba(255,255,255,0.14), transparent 26%),
+                linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(79, 70, 229, 0.96));
+            color: #fff;
+            padding: 2.6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-panel::after {
+            content: "";
+            position: absolute;
+            inset: auto auto -20% -10%;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.26), transparent 65%);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.45rem 0.85rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.16);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 1.25rem;
+        }
+
+        .brand-title {
+            font-size: clamp(2rem, 3vw, 3rem);
+            line-height: 1.08;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .brand-copy {
+            color: rgba(255,255,255,0.78);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .brand-grid {
+            display: grid;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-stat {
+            padding: 1rem 1.1rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .brand-stat strong {
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .auth-kicker {
+            color: var(--brand-primary);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+        }
+
+        .auth-copy {
+            color: var(--text-muted);
+            margin-bottom: 1.8rem;
+        }
+
+        .section-card {
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,242,255,0.84));
+            border: 1px solid rgba(99, 102, 241, 0.08);
+            padding: 1.35rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-card h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-strong);
+            margin-bottom: 0.6rem;
+        }
+
+        .form-control {
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            padding: 0.9rem 1rem;
+            box-shadow: none;
+        }
+
+        .form-control:focus {
+            border-color: rgba(79, 70, 229, 0.45);
+            box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.12);
+        }
+
+        .btn-premium {
+            border: none;
+            border-radius: 999px;
+            padding: 0.9rem 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--brand-primary), #7c3aed);
+            box-shadow: 0 18px 30px rgba(79, 70, 229, 0.22);
+        }
+
+        .btn-premium:hover,
+        .btn-premium:focus {
+            background: linear-gradient(135deg, var(--brand-primary-dark), #6d28d9);
+        }
+
+        .btn-soft {
+            border-radius: 999px;
+            padding: 0.9rem 1.25rem;
+            font-weight: 700;
+        }
+
+        .auth-link {
+            color: var(--brand-primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .auth-link:hover {
+            color: var(--brand-primary-dark);
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: var(--brand-primary);
+        }
+
+        .text-danger.small {
+            margin-top: 0.45rem !important;
+        }
+
+        @media (max-width: 991.98px) {
+            .brand-panel {
+                min-height: 320px;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .auth-layout {
+                padding: 1rem 0;
+            }
+
+            .auth-panel,
+            .brand-panel {
+                padding: 1.5rem;
+            }
+
+            .section-card {
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-7 col-lg-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h3 class="mb-4">用户注册</h3>
-                    <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}">错误信息</div>
+<body>
+<div class="container auth-layout">
+    <div class="auth-shell w-100">
+        <div class="row g-0 overflow-hidden rounded-5">
+            <div class="col-lg-5 order-2 order-lg-1">
+                <div class="brand-panel d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="eyebrow">Create Account</span>
+                        <h1 class="brand-title">创建你的校园活动账户，开始参与与连接。</h1>
+                        <p class="brand-copy">注册后即可查看活动详情、完成报名、维护个人资料。</p>
+                    </div>
+                    <div class="brand-grid">
+                        <div class="brand-stat">
+                            <strong>统一身份入口</strong>
+                            <span>学生用户与管理用户都在同一系统完成核心操作。</span>
+                        </div>
+                        <div class="brand-stat">
+                            <strong>顺畅参与路径</strong>
+                            <span>从注册到账户使用，保持最少干扰与清晰反馈。</span>
+                        </div>
+                        <div class="brand-stat">
+                            <strong>面向校园场景</strong>
+                            <span>更适合活动发布、组织协作与个人报名记录管理。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7 order-1 order-lg-2">
+                <div class="auth-panel d-flex flex-column justify-content-center">
+                    <a th:href="@{/}" class="back-link mb-4">← 返回首页</a>
+                    <div class="auth-kicker">New Account</div>
+                    <h2 class="auth-title">用户注册</h2>
+                    <p class="auth-copy">填写以下信息，创建一个可用于报名和管理活动的系统账号。</p>
+                    <div class="alert alert-danger border-0 rounded-4" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}">错误信息</div>
                     <form th:action="@{/register}" th:object="${registerForm}" method="post">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">用户名</label>
-                                <input type="text" th:field="*{username}" class="form-control" placeholder="唯一用户名">
-                                <div class="text-danger small mt-1" th:errors="*{username}"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">真实姓名</label>
-                                <input type="text" th:field="*{realName}" class="form-control" placeholder="请输入真实姓名">
-                                <div class="text-danger small mt-1" th:errors="*{realName}"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">密码</label>
-                                <input type="password" th:field="*{password}" class="form-control" placeholder="请输入密码">
-                                <div class="text-danger small mt-1" th:errors="*{password}"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">确认密码</label>
-                                <input type="password" th:field="*{confirmPassword}" class="form-control" placeholder="请再次输入密码">
-                                <div class="text-danger small mt-1" th:errors="*{confirmPassword}"></div>
+                        <div class="section-card">
+                            <h3>基础信息</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">用户名</label>
+                                    <input type="text" th:field="*{username}" class="form-control" placeholder="唯一用户名">
+                                    <div class="text-danger small mt-1" th:errors="*{username}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">真实姓名</label>
+                                    <input type="text" th:field="*{realName}" class="form-control" placeholder="请输入真实姓名">
+                                    <div class="text-danger small mt-1" th:errors="*{realName}"></div>
+                                </div>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between mt-4">
-                            <a th:href="@{/}" class="btn btn-outline-secondary">返回首页</a>
-                            <button type="submit" class="btn btn-primary">提交注册</button>
+                        <div class="section-card mb-0">
+                            <h3>账户安全</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">密码</label>
+                                    <input type="password" th:field="*{password}" class="form-control" placeholder="请输入密码">
+                                    <div class="text-danger small mt-1" th:errors="*{password}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">确认密码</label>
+                                    <input type="password" th:field="*{confirmPassword}" class="form-control" placeholder="请再次输入密码">
+                                    <div class="text-danger small mt-1" th:errors="*{confirmPassword}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-3 mt-4">
+                            <a th:href="@{/}" class="btn btn-outline-secondary btn-soft">返回首页</a>
+                            <button type="submit" class="btn btn-premium text-white btn-soft">提交注册</button>
                         </div>
                     </form>
+                    <div class="mt-4 text-center text-md-start">
+                        <span class="text-muted">已经有账号？</span>
+                        <a th:href="@{/login}" class="auth-link">立即登录</a>
+                    </div>
                 </div>
             </div>
         </div>
