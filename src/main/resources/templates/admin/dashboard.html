@@ -307,8 +307,9 @@
                         </a>
                     </nav>
                     <div class="sidebar-meta mt-auto">
-                        <div class="fw-semibold mb-1">当前工作模式</div>
-                        <small>根据所选标签切换活动与用户的不同管理视图。</small>
+                        <div class="fw-semibold mb-1">温馨提示</div>
+                        <small>温馨提示</small>
+                        <small>后台操作将影响数据的准确性和用户体验，请小心谨慎哦</small>
                     </div>
                     <div class="d-grid gap-2">
                         <a th:href="@{/activities/admin/create}" class="btn btn-premium btn-pill text-white">发布活动</a>
@@ -324,11 +325,11 @@
                         <div class="section-kicker text-white-50 mb-2">Management Dashboard</div>
                         <div th:if="${activeTab == 'users'}">
                             <h2 class="hero-title">用户管理</h2>
-                            <p class="hero-copy">集中查看系统内用户数据，维护基础资料与权限角色，保持账户体系清晰有序。</p>
+                            <p class="hero-copy">集中查看系统内用户数据，维护基础资料与权限角色，保持账户体系井然有序。</p>
                         </div>
                         <div th:if="${activeTab != 'users'}">
                             <h2 class="hero-title">活动管理</h2>
-                            <p class="hero-copy">统一维护活动信息、检查容量状态，并通过管理入口快速进入查看、编辑与删除流程。</p>
+                            <p class="hero-copy">统一维护活动信息，并通过管理入口快速进入查看、编辑与删除流程。</p>
                         </div>
                         <div class="d-flex flex-column flex-sm-row gap-3">
                             <a th:if="${activeTab == 'users'}" th:href="@{/admin/users/create}" class="btn btn-light btn-pill">新增用户</a>
@@ -374,10 +375,7 @@
             <section class="table-shell" th:if="${activeTab == 'users' && userPage.total > 0}">
                 <div class="table-panel">
                     <div class="table-head">
-                        <div>
-                            <h2>用户列表</h2>
-                            <p>查看当前系统中的用户资料、角色与创建时间，并继续执行维护操作。</p>
-                        </div>
+                        <h2>用户列表</h2>
                     </div>
                     <div class="table-wrap table-responsive">
                         <table class="table align-middle mb-0">
@@ -416,10 +414,7 @@
             <section class="table-shell" th:if="${activeTab != 'users' && activityPage.total > 0}">
                 <div class="table-panel">
                     <div class="table-head">
-                        <div>
                             <h2>活动列表</h2>
-                            <p>查看活动名称、地点、开始时间与当前人数信息，并按现有流程完成维护。</p>
-                        </div>
                     </div>
                     <div class="table-wrap table-responsive">
                         <table class="table align-middle mb-0">

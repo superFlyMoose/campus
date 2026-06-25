@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
@@ -19,13 +20,16 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
     private final ActivityMessageProducer activityMessageProducer;
     private final DashboardCacheService dashboardCacheService;
     private final ActivityCacheService activityCacheService;
+    private final FileService fileService;
 
     public ActivityService(ActivityMessageProducer activityMessageProducer,
                            DashboardCacheService dashboardCacheService,
-                           ActivityCacheService activityCacheService) {
+                           ActivityCacheService activityCacheService,
+                           FileService fileService) {
         this.activityMessageProducer = activityMessageProducer;
         this.dashboardCacheService = dashboardCacheService;
         this.activityCacheService = activityCacheService;
+        this.fileService = fileService;
     }
 
     public Page<Activity> searchActivities(String keyword, String location, int pageNum, int pageSize) {
@@ -67,7 +71,7 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
         activity.setEndTime(form.getEndTime());
         activity.setMaxPeople(form.getMaxPeople());
         activity.setCurrentPeople(0);
-        activity.setImagePath("");
+        activity.setImagePath(form.getImagePath());
         activity.setStatus(0);
         activity.setIsDeleted(0);
         save(activity);
@@ -85,6 +89,7 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
         activity.setStartTime(form.getStartTime());
         activity.setEndTime(form.getEndTime());
         activity.setMaxPeople(form.getMaxPeople());
+        activity.setImagePath(form.getImagePath());
         updateById(activity);
         dashboardCacheService.evictDashboardCache();
         activityCacheService.evictAllActivityCaches();
@@ -100,6 +105,13 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
         return activity.getStartTime() != null
             && activity.getStartTime().isAfter(LocalDateTime.now())
             && activity.getCurrentPeople() < activity.getMaxPeople();
+    }
+
+    public void bindActivityImage(ActivityForm form, MultipartFile imageFile) {
+        if (imageFile == null || imageFile.isEmpty()) {
+            return;
+        }
+        form.setImagePath(fileService.saveFile(imageFile, 0L, "activity").getFilePath());
     }
 
     private void validateTime(ActivityForm form) {
@@ -119,4 +131,5 @@ public class ActivityService extends ServiceImpl<ActivityMapper, Activity> {
         activityMessageProducer.send(RabbitMqConfig.ACTIVITY_CREATED_ROUTING_KEY, message);
     }
 }
+
 

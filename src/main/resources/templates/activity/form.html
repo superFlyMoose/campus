@@ -123,6 +123,27 @@
             padding: 0.9rem 1rem;
         }
 
+        .form-control[type="file"] {
+            padding: 0.75rem 1rem;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,242,255,0.78));
+        }
+
+        .image-preview {
+            display: block;
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.12);
+            box-shadow: 0 18px 40px rgba(79, 70, 229, 0.12);
+        }
+
+        .helper-text {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-top: 0.75rem;
+        }
+
         textarea.form-control {
             min-height: 180px;
             resize: vertical;
@@ -169,20 +190,20 @@
         <div class="page-panel">
             <span class="eyebrow">Activity Editor</span>
             <h1 class="page-title" th:text="${pageTitle}">活动表单</h1>
-            <p class="page-copy">在不改变现有业务逻辑的前提下，对活动名称、时间、地点、人数与内容进行完整维护。</p>
+            <p class="page-copy">在这里，您可对活动名称、时间、地点、人数与内容进行完整维护。</p>
         </div>
     </section>
 
     <div class="row justify-content-center">
-        <div class="col-xl-9">
+        <div class="col-12">
             <section class="form-shell">
                 <div class="form-panel">
                     <div class="alert alert-danger border-0 rounded-4" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}">错误</div>
-                    <form th:action="${formAction}" th:object="${activityForm}" method="post">
+                    <form th:action="${formAction}" th:object="${activityForm}" method="post" enctype="multipart/form-data">
                         <div class="group-shell mb-3">
                             <div class="group-panel">
                                 <div class="group-title">基础信息</div>
-                                <div class="group-copy">设置活动最核心的标题与地点信息，确保用户能快速识别活动内容。</div>
+                                <div class="group-copy">请设置活动最核心的标题与地点信息，确保用户能快速识别活动内容。</div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label">活动名称</label>
@@ -201,7 +222,7 @@
                         <div class="group-shell mb-3">
                             <div class="group-panel">
                                 <div class="group-title">时间与容量</div>
-                                <div class="group-copy">明确活动开始、结束时间以及人数上限，帮助系统按当前逻辑进行报名控制。</div>
+                                <div class="group-copy">请明确活动开始、结束时间以及人数上限。</div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label">开始时间</label>
@@ -222,10 +243,28 @@
                             </div>
                         </div>
 
+                        <div class="group-shell mb-3">
+                            <div class="group-panel">
+                                <div class="group-title">活动图片</div>
+                                <div class="group-copy">请上传活动海报或现场图片。</div>
+                                <div class="row g-3 align-items-start">
+                                    <div class="col-lg-7">
+                                        <label class="form-label">活动图片</label>
+                                        <input type="file" name="imageFile" class="form-control" accept=".jpg,.jpeg,.png,.gif,.webp">
+                                        <input type="hidden" th:field="*{imagePath}">
+                                        <div class="helper-text">支持 JPG、PNG、GIF、WEBP；未重新上传时保留当前图片。</div>
+                                    </div>
+                                    <div class="col-lg-5" th:if="${activityForm.imagePath != null and !#strings.isEmpty(activityForm.imagePath)}">
+                                        <img th:src="${activityForm.imagePath}" alt="活动图片预览" class="image-preview">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="group-shell mb-4">
                             <div class="group-panel">
                                 <div class="group-title">活动内容</div>
-                                <div class="group-copy">详细描述活动流程、参与方式与注意事项，提升用户在详情页中的阅读体验。</div>
+                                <div class="group-copy">请详细描述活动流程、参与方式与注意事项，提升用户在详情页中的阅读体验。</div>
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label class="form-label">活动内容</label>
@@ -237,7 +276,7 @@
                         </div>
 
                         <div class="d-flex flex-column flex-sm-row justify-content-between gap-3">
-                            <a th:href="@{/activities}" class="btn btn-outline-secondary btn-pill">返回列表</a>
+                            <a th:href="${pageTitle == '编辑活动'||pageTitle== '发布活动'} ? @{/admin/dashboard(tab='activity')} : @{/activities}" class="btn btn-outline-secondary btn-pill">返回列表</a>
                             <button type="submit" class="btn btn-premium btn-pill text-white">保存</button>
                         </div>
                     </form>

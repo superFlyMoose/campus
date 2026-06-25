@@ -409,10 +409,10 @@
             <div class="row align-items-center g-4 position-relative" style="z-index: 1;">
                 <div class="col-lg-7">
                     <h1 class="hero-title">把校园里的每一次参与、组织与发现，汇聚成清晰而有温度的活动体验。</h1>
-                    <p class="hero-copy">从热门活动浏览、即时报名到数据趋势洞察，这里为学生与管理者提供统一、直观且更具现代感的校园活动操作入口。</p>
+                    <p class="hero-copy">从热门活动浏览、即时报名到数据趋势洞察，这里为学生与管理者提供统一、直观的校园活动平台。</p>
                     <div class="d-flex flex-column flex-sm-row gap-3">
                         <a class="btn btn-light btn-lg cta-btn-light" th:href="@{/activities}">浏览活动</a>
-                        <a class="btn btn-outline-light btn-lg rounded-pill px-4" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">进入管理端</a>
+                        <a class="btn btn-outline-light btn-lg rounded-pill px-4" style="align-content: center" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">进入管理端</a>
                         <button type="button" class="btn btn-outline-light btn-lg rounded-pill px-4" th:if="${!#authorization.expression('hasRole(''ADMIN'')')}" onclick="alert('您当前没有管理端访问权限');">查看管理端</button>
                     </div>
                 </div>
@@ -479,7 +479,7 @@
                 <div class="metrics-panel">
                     <div class="metrics-label" th:text="${entry.key}">统计项</div>
                     <div class="metrics-value" th:text="${entry.value}">0</div>
-                    <p class="metrics-note">持续关注校园参与热度与活动组织节奏</p>
+                    <p class="metrics-note">持续关注校园活动参与节奏！</p>
                 </div>
             </div>
         </div>
@@ -505,11 +505,11 @@
             <div>
                 <div class="section-kicker text-white-50 mb-2">快速入口</div>
                 <h2 class="h3 fw-bold mb-2">让发现活动、参与活动与管理活动形成一条流畅路径。</h2>
-                <p>无论你是学生参与者，还是活动组织者，都可以从统一入口高效完成自己的任务。</p>
+                <p>无论您是学生参与者，还是活动组织者，都可以在这里高效获取并参与/管理校园活动。</p>
             </div>
             <div class="d-flex flex-column flex-sm-row gap-3 w-100 w-lg-auto">
                 <a class="btn btn-light cta-btn-light" th:href="@{/activities}">查看所有活动</a>
-                <a class="btn btn-outline-light rounded-pill px-4" th:href="@{/user/profile}" th:if="${#authorization.expression('isAuthenticated()')}">进入个人中心</a>
+                <a class="btn btn-outline-light rounded-pill px-4" style="align-content: center" th:href="@{/user/profile}" th:if="${#authorization.expression('isAuthenticated()')}">进入个人中心</a>
             </div>
         </div>
     </section>

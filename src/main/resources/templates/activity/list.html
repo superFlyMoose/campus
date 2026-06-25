@@ -189,7 +189,7 @@
         }
 
         .activity-cover {
-            min-height: 140px;
+            min-height: 220px;
             border-radius: 20px;
             padding: 1.1rem;
             background:
@@ -200,6 +200,33 @@
             flex-direction: column;
             justify-content: space-between;
             margin-bottom: 1.25rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .activity-cover.has-image::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent 32%),
+                linear-gradient(135deg, rgba(79, 70, 229, 0.22), rgba(20, 184, 166, 0.18));
+            z-index: 0;
+        }
+
+        .activity-cover-image {
+            border-radius: inherit;
+            position: absolute;
+            align-self: center;
+            inset: 0;
+            width: 80%;
+            height: 80%;
+            object-fit: cover;
+        }
+
+        .activity-cover > * {
+            position: relative;
+            z-index: 1;
         }
 
         .activity-tag {
@@ -326,7 +353,7 @@
             <div class="d-flex flex-column flex-xl-row justify-content-between gap-4 position-relative" style="z-index: 1;">
                 <div>
                     <h1 class="page-title">活动大厅</h1>
-                    <p class="page-copy">集中浏览校园内正在开放的活动，按名称与地点快速检索，并根据角色进入报名或管理流程。</p>
+                    <p class="page-copy">这里将为您提供所有校园内正在开放的活动，可按名称与地点快速筛选您心仪的活动。</p>
                     <div class="d-flex flex-column flex-sm-row gap-3">
                         <a th:href="@{/}" class="btn btn-light btn-pill">返回首页</a>
                         <a th:href="@{/admin/dashboard}" class="btn btn-outline-light btn-pill" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">进入管理端</a>
@@ -356,7 +383,7 @@
             <div class="section-heading">
                 <div>
                     <h2>活动筛选</h2>
-                    <p>使用关键词和地点快速缩小范围，定位最相关的校园活动。</p>
+                    <p>使用关键词和地点快速缩小范围，定位您最钟意的校园活动。</p>
                 </div>
             </div>
             <form class="row filter-grid align-items-end" method="get" th:action="@{/activities}">
@@ -378,17 +405,17 @@
 
     <section th:if="${pageData.total > 0}">
         <div class="section-heading mb-4">
-            <div>
-                <h2>活动列表</h2>
-                <p>查看当前符合条件的活动卡片，并根据权限进入不同操作。</p>
-            </div>
+            <h2>活动列表</h2>
         </div>
         <div class="row g-4">
             <div class="col-md-6 col-xl-4" th:each="activity : ${pageData.records}">
                 <div class="activity-shell h-100">
                     <div class="activity-panel">
-                        <div class="activity-cover">
+                        <div class="activity-cover" th:classappend="${activity.imagePath != null and !#strings.isEmpty(activity.imagePath)} ? ' has-image' : ''">
                             <span class="activity-tag">Campus Event</span>
+                            <br>
+                            <img th:if="${activity.imagePath != null and !#strings.isEmpty(activity.imagePath)}" th:src="${activity.imagePath}" alt="活动封面" class="activity-cover-image">
+                            <br>
                             <div>
                                 <h3 class="h5 fw-bold mb-2" th:text="${activity.title}">活动标题</h3>
                                 <small>报名信息与时间安排将在详情页继续展开。</small>

@@ -165,12 +165,12 @@
         <div class="page-panel">
             <span class="eyebrow">User Editor</span>
             <h1 class="page-title" th:text="${pageTitle}">用户表单</h1>
-            <p class="page-copy">在保持现有权限与后端逻辑不变的前提下，维护用户账号、姓名、角色与密码信息。</p>
+            <p class="page-copy">最简洁优雅的管理布局将为您维护用户账号、姓名、角色与密码信息提供便捷。</p>
         </div>
     </section>
 
     <div class="row justify-content-center">
-        <div class="col-xl-8">
+        <div class="col-12">
             <section class="form-shell">
                 <div class="form-panel">
                     <div class="alert alert-danger border-0 rounded-4" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}">错误</div>
@@ -178,7 +178,7 @@
                         <div class="group-shell mb-3">
                             <div class="group-panel">
                                 <div class="group-title">基础资料</div>
-                                <div class="group-copy">填写用户名与真实姓名，确保后台列表与账号识别信息保持清晰。</div>
+                                <div class="group-copy">请填写用户名与真实姓名。</div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label">用户名</label>
@@ -197,7 +197,7 @@
                         <div class="group-shell mb-4">
                             <div class="group-panel">
                                 <div class="group-title">角色与安全</div>
-                                <div class="group-copy">维持既有角色枚举和密码提交规则，编辑状态下留空仍表示不修改密码。</div>
+                                <div class="group-copy">请填写角色和密码，编辑状态下密码留空表示不修改密码。</div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label">角色</label>

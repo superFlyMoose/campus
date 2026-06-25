@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -69,13 +70,15 @@ public class ActivityController {
     public String create(@Valid @ModelAttribute ActivityForm activityForm,
                          BindingResult bindingResult,
                          Model model,
-                         RedirectAttributes redirectAttributes) {
+                         RedirectAttributes redirectAttributes,
+                         @RequestParam(name = "imageFile", required = false) MultipartFile imageFile) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("formAction", "/activities/admin/create");
             model.addAttribute("pageTitle", "发布活动");
             return "activity/form";
         }
         try {
+            activityService.bindActivityImage(activityForm, imageFile);
             activityService.createActivity(activityForm);
         } catch (IllegalArgumentException ex) {
             bindingResult.reject("activityError", ex.getMessage());
@@ -97,6 +100,7 @@ public class ActivityController {
         form.setStartTime(activity.getStartTime());
         form.setEndTime(activity.getEndTime());
         form.setMaxPeople(activity.getMaxPeople());
+        form.setImagePath(activity.getImagePath());
         model.addAttribute("activityForm", form);
         model.addAttribute("formAction", "/activities/admin/" + id + "/edit");
         model.addAttribute("pageTitle", "编辑活动");
@@ -108,13 +112,15 @@ public class ActivityController {
                        @Valid @ModelAttribute ActivityForm activityForm,
                        BindingResult bindingResult,
                        Model model,
-                       RedirectAttributes redirectAttributes) {
+                       RedirectAttributes redirectAttributes,
+                       @RequestParam(name = "imageFile", required = false) MultipartFile imageFile) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("formAction", "/activities/admin/" + id + "/edit");
             model.addAttribute("pageTitle", "编辑活动");
             return "activity/form";
         }
         try {
+            activityService.bindActivityImage(activityForm, imageFile);
             activityService.updateActivity(id, activityForm);
         } catch (IllegalArgumentException ex) {
             bindingResult.reject("activityError", ex.getMessage());

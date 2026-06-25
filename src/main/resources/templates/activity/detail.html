@@ -78,6 +78,18 @@
             margin-bottom: 1rem;
         }
 
+        .hero-layout {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .hero-main {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
         .hero-title {
             font-size: clamp(2.2rem, 4vw, 3.6rem);
             line-height: 1.08;
@@ -117,6 +129,27 @@
         .content-panel,
         .summary-panel {
             padding: 1.6rem;
+            height: 100%;
+        }
+
+        .hero-image-wrap {
+            width: 240px;
+            height: 180px;
+            flex: 0 0 240px;
+            border-radius: 26px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: var(--shadow-card);
+            position: relative;
+            z-index: 1;
+            align-self: flex-start;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .summary-grid {
@@ -173,6 +206,7 @@
             color: #334155;
             line-height: 1.85;
             white-space: pre-line;
+            flex: 1 1 auto;
         }
 
         .apply-box {
@@ -186,6 +220,19 @@
         .apply-box p {
             color: var(--text-muted);
             margin-bottom: 1rem;
+        }
+
+        @media (max-width: 991.98px) {
+            .hero-layout {
+                flex-direction: column;
+            }
+
+            .hero-image-wrap {
+                width: 100%;
+                max-width: 320px;
+                height: 220px;
+                flex-basis: auto;
+            }
         }
 
         @media (max-width: 767.98px) {
@@ -207,33 +254,38 @@
     <section class="hero-shell mb-4">
         <div class="hero-panel">
             <span class="eyebrow">Activity Detail</span>
-            <div class="position-relative" style="z-index: 1;">
-                <h1 class="hero-title" th:text="${activity.title}">活动标题</h1>
-                <p class="hero-copy">查看活动时间、地点、人数信息与详细内容，并在确认后快速完成报名。</p>
-                <div class="hero-actions d-flex flex-column flex-sm-row gap-3">
-                    <a th:href="@{/activities}" class="btn btn-light btn-pill">返回列表</a>
-                    <form th:action="@{|/registrations/activity/${activity.id}|}" method="post">
-                        <button type="submit" class="btn btn-outline-light btn-pill">立即报名</button>
-                    </form>
+            <div class="position-relative hero-layout" style="z-index: 1;">
+                <div class="hero-main">
+                    <h1 class="hero-title" th:text="${activity.title}">活动标题</h1>
+                    <p class="hero-copy">查看活动时间、地点、人数信息与详细内容，帮助您第一时间了解详情。</p>
+                    <div class="hero-actions d-flex flex-column flex-sm-row gap-3">
+                        <a th:href="@{/activities}" class="btn btn-light btn-pill">返回列表</a>
+                        <form th:action="@{|/registrations/activity/${activity.id}|}" method="post">
+                            <button type="submit" class="btn btn-outline-light btn-pill">立即报名</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="hero-image-wrap" th:if="${activity.imagePath != null and !#strings.isEmpty(activity.imagePath)}">
+                    <img th:src="${activity.imagePath}" alt="活动主图" class="hero-image">
                 </div>
             </div>
         </div>
     </section>
 
-    <div class="row g-4 align-items-start">
-        <div class="col-lg-8">
-            <section class="content-shell h-100">
-                <div class="content-panel">
+    <div class="row g-4 align-items-stretch">
+        <div class="col-lg-8 d-flex">
+            <section class="content-shell h-100 w-100">
+                <div class="content-panel d-flex flex-column h-100">
                     <div class="section-kicker">活动介绍</div>
                     <h2 class="section-title">了解这场活动的核心内容</h2>
-                    <p class="section-copy">在报名前先确认活动安排与参与价值，确保时间与地点都符合你的计划。</p>
+                    <p class="section-copy">在报名前先确认活动安排与参与价值，确保时间与地点都符合您的计划哦。</p>
                     <div class="content-box" th:text="${activity.content}">活动内容</div>
                 </div>
             </section>
         </div>
-        <div class="col-lg-4">
-            <section class="summary-shell mb-4">
-                <div class="summary-panel">
+        <div class="col-lg-4 d-flex">
+            <section class="summary-shell mb-4 h-100 w-100">
+                <div class="summary-panel d-flex flex-column h-100">
                     <div class="section-kicker">活动摘要</div>
                     <h2 class="h4 fw-bold mb-4">关键信息</h2>
                     <div class="summary-grid">
@@ -256,7 +308,7 @@
                     </div>
                     <div class="apply-box">
                         <h3 class="h5 fw-bold mb-2">准备参与这场活动？</h3>
-                        <p>确认信息无误后可直接提交报名，系统将按照现有规则记录你的参与信息。</p>
+                        <p>确认信息无误后可直接提交报名，系统将记录您的参与信息。</p>
                         <form th:action="@{|/registrations/activity/${activity.id}|}" method="post">
                             <button type="submit" class="btn btn-premium btn-pill text-white w-100">立即报名</button>
                         </form>

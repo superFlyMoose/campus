@@ -31,4 +31,6 @@ public class ActivityForm {
     @NotNull(message = "人数上限不能为空")
     @Min(value = 1, message = "人数上限至少为1")
     private Integer maxPeople;
+
+    private String imagePath;
 }
