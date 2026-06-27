@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>校园活动管理系统</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --brand-primary: #4f46e5;
@@ -102,9 +101,7 @@
 
         .hero-shell,
         .section-shell,
-        .metrics-card,
         .activity-card,
-        .chart-shell,
         .cta-shell {
             border: 1px solid rgba(255,255,255,0.8);
             border-radius: var(--radius-xl);
@@ -115,9 +112,7 @@
 
         .hero-panel,
         .section-panel,
-        .metrics-panel,
         .activity-panel,
-        .chart-panel,
         .cta-panel {
             border-radius: calc(var(--radius-xl) - 10px);
             background: var(--surface);
@@ -201,7 +196,6 @@
         }
 
         .section-panel,
-        .chart-panel,
         .cta-panel {
             padding: 1.75rem;
         }
@@ -266,38 +260,6 @@
             margin-bottom: 1.5rem;
         }
 
-        .metrics-panel {
-            padding: 1.5rem;
-            height: 100%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(238,242,255,0.88));
-        }
-
-        .metrics-label {
-            color: var(--text-muted);
-            font-size: 0.88rem;
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        .metrics-value {
-            font-size: clamp(2rem, 3vw, 2.6rem);
-            font-weight: 700;
-            margin-bottom: 0.45rem;
-        }
-
-        .metrics-note {
-            color: var(--brand-accent);
-            font-size: 0.9rem;
-            margin-bottom: 0;
-        }
-
-        .chart-panel {
-            background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(248,250,255,0.92));
-        }
-
-        .chart-wrap {
-            height: 340px;
-        }
 
         .cta-panel {
             display: flex;
@@ -360,7 +322,6 @@
 
             .hero-panel,
             .section-panel,
-            .chart-panel,
             .cta-panel {
                 padding: 1.5rem;
             }
@@ -409,19 +370,11 @@
             <div class="row align-items-center g-4 position-relative" style="z-index: 1;">
                 <div class="col-lg-7">
                     <h1 class="hero-title">把校园里的每一次参与、组织与发现，汇聚成清晰而有温度的活动体验。</h1>
-                    <p class="hero-copy">从热门活动浏览、即时报名到数据趋势洞察，这里为学生与管理者提供统一、直观的校园活动平台。</p>
+                    <p class="hero-copy">从热门活动浏览到即时参与，这里为学生与管理者提供统一、直观的校园活动平台。</p>
                     <div class="d-flex flex-column flex-sm-row gap-3">
                         <a class="btn btn-light btn-lg cta-btn-light" th:href="@{/activities}">浏览活动</a>
                         <a class="btn btn-outline-light btn-lg rounded-pill px-4" style="align-content: center" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">进入管理端</a>
                         <button type="button" class="btn btn-outline-light btn-lg rounded-pill px-4" th:if="${!#authorization.expression('hasRole(''ADMIN'')')}" onclick="alert('您当前没有管理端访问权限');">查看管理端</button>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="hero-stat-grid">
-                        <div class="hero-stat" th:each="entry : ${summary}">
-                            <span class="hero-stat-label" th:text="${entry.key}">统计项</span>
-                            <span class="hero-stat-value" th:text="${entry.value}">0</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -473,32 +426,6 @@
         </div>
     </section>
 
-    <section class="row g-4 mb-4">
-        <div class="col-md-4" th:each="entry : ${summary}">
-            <div class="metrics-card h-100">
-                <div class="metrics-panel">
-                    <div class="metrics-label" th:text="${entry.key}">统计项</div>
-                    <div class="metrics-value" th:text="${entry.value}">0</div>
-                    <p class="metrics-note">持续关注校园活动参与节奏！</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="chart-shell mb-4">
-        <div class="chart-panel">
-            <div class="section-heading">
-                <div>
-                    <div class="section-kicker">趋势洞察</div>
-                    <h2 class="section-title mb-2">近 7 天活动趋势</h2>
-                    <p class="section-copy">结合活动发布与报名增长，快速查看近期校园活动活跃度变化。</p>
-                </div>
-            </div>
-            <div class="chart-wrap">
-                <canvas id="dashboardChart"></canvas>
-            </div>
-        </div>
-    </section>
 
     <section class="cta-shell">
         <div class="cta-panel">
@@ -515,92 +442,6 @@
     </section>
 </div>
 
-<script th:inline="javascript">
-    const chartData = /*[[${chartData}]]*/ {};
-    const canvas = document.getElementById('dashboardChart');
-    if (canvas && chartData.labels) {
-        const context = canvas.getContext('2d');
-        const gradientActivity = context.createLinearGradient(0, 0, 0, 320);
-        gradientActivity.addColorStop(0, 'rgba(79, 70, 229, 0.28)');
-        gradientActivity.addColorStop(1, 'rgba(79, 70, 229, 0.02)');
-
-        const gradientRegistration = context.createLinearGradient(0, 0, 0, 320);
-        gradientRegistration.addColorStop(0, 'rgba(20, 184, 166, 0.24)');
-        gradientRegistration.addColorStop(1, 'rgba(20, 184, 166, 0.02)');
-
-        new Chart(canvas, {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [
-                    {
-                        label: '新增活动',
-                        data: chartData.activityCounts,
-                        borderColor: '#4f46e5',
-                        backgroundColor: gradientActivity,
-                        borderWidth: 3,
-                        pointRadius: 3,
-                        pointHoverRadius: 5,
-                        pointBackgroundColor: '#4f46e5',
-                        fill: true,
-                        tension: 0.38
-                    },
-                    {
-                        label: '新增报名',
-                        data: chartData.registrationCounts,
-                        borderColor: '#14b8a6',
-                        backgroundColor: gradientRegistration,
-                        borderWidth: 3,
-                        pointRadius: 3,
-                        pointHoverRadius: 5,
-                        pointBackgroundColor: '#14b8a6',
-                        fill: true,
-                        tension: 0.38
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            usePointStyle: true,
-                            boxWidth: 8,
-                            color: '#334155',
-                            padding: 18
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#64748b'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0,
-                            color: '#64748b'
-                        },
-                        grid: {
-                            color: 'rgba(148, 163, 184, 0.16)'
-                        }
-                    }
-                }
-            }
-        });
-    }
-</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

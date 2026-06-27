@@ -5,6 +5,7 @@ import com.campus.management.dto.UserForm;
 import com.campus.management.entity.Activity;
 import com.campus.management.entity.SysUser;
 import com.campus.management.service.ActivityService;
+import com.campus.management.service.DashboardService;
 import com.campus.management.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,13 +23,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AdminController {
     private final UserService userService;
     private final ActivityService activityService;
+    private final DashboardService dashboardService;
     private final PasswordEncoder passwordEncoder;
 
     public AdminController(UserService userService,
                            ActivityService activityService,
+                           DashboardService dashboardService,
                            PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.activityService = activityService;
+        this.dashboardService = dashboardService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -40,6 +44,9 @@ public class AdminController {
         if ("users".equals(tab)) {
             Page<SysUser> userPage = userService.pageUsers(page, 10);
             model.addAttribute("userPage", userPage);
+        } else if ("stats".equals(tab)) {
+            model.addAttribute("summary", dashboardService.getSummary());
+            model.addAttribute("chartData", dashboardService.getChartData());
         } else {
             Page<Activity> activityPage = activityService.searchActivities("", "", page, 8);
             model.addAttribute("activityPage", activityPage);

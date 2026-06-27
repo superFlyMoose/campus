@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>管理端首页</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --brand-primary: #4f46e5;
@@ -36,7 +37,8 @@
         .hero-shell,
         .metric-shell,
         .table-shell,
-        .state-shell {
+        .state-shell,
+        .chart-shell {
             border-radius: 28px;
             border: 1px solid rgba(255,255,255,0.9);
             background: rgba(255,255,255,0.4);
@@ -48,7 +50,8 @@
         .hero-panel,
         .metric-panel,
         .table-panel,
-        .state-panel {
+        .state-panel,
+        .chart-panel {
             border-radius: 22px;
             border: 1px solid var(--line-soft);
             background: var(--surface);
@@ -195,8 +198,17 @@
         }
 
         .table-panel,
-        .state-panel {
+        .state-panel,
+        .chart-panel {
             padding: 1.5rem;
+        }
+
+        .chart-panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,255,0.92));
+        }
+
+        .chart-wrap {
+            height: 340px;
         }
 
         .table-head {
@@ -279,6 +291,7 @@
             .metric-panel,
             .table-panel,
             .state-panel,
+            .chart-panel,
             .empty-panel {
                 padding: 1.35rem;
             }
@@ -305,6 +318,10 @@
                             <span>用户管理</span>
                             <span>›</span>
                         </a>
+                        <a th:href="@{/admin/dashboard(tab='stats')}" class="admin-nav-link" th:classappend="${activeTab == 'stats'} ? ' active' : ''">
+                            <span>数据统计</span>
+                            <span>›</span>
+                        </a>
                     </nav>
                     <div class="sidebar-meta mt-auto">
                         <div class="fw-semibold mb-1">温馨提示</div>
@@ -327,14 +344,20 @@
                             <h2 class="hero-title">用户管理</h2>
                             <p class="hero-copy">集中查看系统内用户数据，维护基础资料与权限角色，保持账户体系井然有序。</p>
                         </div>
-                        <div th:if="${activeTab != 'users'}">
+                        <div th:if="${activeTab == 'stats'}">
+                            <h2 class="hero-title">数据统计</h2>
+                            <p class="hero-copy">集中查看平台用户、活动与报名数据，并通过趋势图快速把握近期校园活动活跃度变化。</p>
+                        </div>
+                        <div th:if="${activeTab != 'users' && activeTab != 'stats'}">
                             <h2 class="hero-title">活动管理</h2>
                             <p class="hero-copy">统一维护活动信息，并通过管理入口快速进入查看、编辑与删除流程。</p>
                         </div>
                         <div class="d-flex flex-column flex-sm-row gap-3">
                             <a th:if="${activeTab == 'users'}" th:href="@{/admin/users/create}" class="btn btn-light btn-pill">新增用户</a>
-                            <a th:if="${activeTab != 'users'}" th:href="@{/activities}" class="btn btn-light btn-pill">进入活动大厅</a>
-                            <a th:if="${activeTab != 'users'}" th:href="@{/activities/admin/create}" class="btn btn-outline-light btn-pill">继续发布活动</a>
+                            <a th:if="${activeTab == 'stats'}" th:href="@{/}" class="btn btn-light btn-pill">返回系统首页</a>
+                            <a th:if="${activeTab != 'users' && activeTab != 'stats'}" th:href="@{/activities}" class="btn btn-light btn-pill">进入活动大厅</a>
+                            <a th:if="${activeTab == 'stats'}" th:href="@{/activities}" class="btn btn-outline-light btn-pill">查看活动大厅</a>
+                            <a th:if="${activeTab != 'users' && activeTab != 'stats'}" th:href="@{/activities/admin/create}" class="btn btn-outline-light btn-pill">继续发布活动</a>
                         </div>
                     </div>
                 </div>
@@ -357,7 +380,19 @@
                 </div>
             </section>
 
-            <section class="row g-4 mb-4" th:if="${activeTab != 'users'}">
+            <section class="row g-4 mb-4" th:if="${activeTab == 'stats'}">
+                <div class="col-md-4" th:each="entry : ${summary}">
+                    <div class="metric-shell h-100">
+                        <div class="metric-panel">
+                            <div class="metric-label" th:text="${entry.key}">统计项</div>
+                            <div class="metric-value" th:text="${entry.value}">0</div>
+                            <p class="metric-note">持续关注校园活动参与节奏！</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="row g-4 mb-4" th:if="${activeTab != 'users' && activeTab != 'stats'}">
                 <div class="col-md-6 col-xl-3">
                     <div class="metric-shell h-100"><div class="metric-panel"><div class="metric-label">当前视图</div><div class="metric-value">活动</div><p class="metric-note">聚焦活动全生命周期维护</p></div></div>
                 </div>
@@ -369,6 +404,20 @@
                 </div>
                 <div class="col-md-6 col-xl-3">
                     <div class="metric-shell h-100"><div class="metric-panel"><div class="metric-label">工作目标</div><div class="metric-value">稳定运营</div><p class="metric-note">确保活动数据清晰可控</p></div></div>
+                </div>
+            </section>
+
+            <section class="chart-shell mb-4" th:if="${activeTab == 'stats'}">
+                <div class="chart-panel">
+                    <div class="table-head">
+                        <div>
+                            <h2>近 7 天活动趋势</h2>
+                            <p>结合活动发布与报名增长，快速查看近期校园活动活跃度变化。</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="dashboardChart"></canvas>
+                    </div>
                 </div>
             </section>
 
@@ -411,7 +460,7 @@
                 </div>
             </section>
 
-            <section class="table-shell" th:if="${activeTab != 'users' && activityPage.total > 0}">
+            <section class="table-shell" th:if="${activeTab != 'users' && activeTab != 'stats' && activityPage.total > 0}">
                 <div class="table-panel">
                     <div class="table-head">
                             <h2>活动列表</h2>
@@ -455,11 +504,97 @@
                 <div class="state-panel empty-panel">暂无用户数据。</div>
             </section>
 
-            <section class="state-shell" th:if="${activeTab != 'users' && activityPage.total == 0}">
+            <section class="state-shell" th:if="${activeTab != 'users' && activeTab != 'stats' && activityPage.total == 0}">
                 <div class="state-panel empty-panel">暂无活动数据。</div>
             </section>
         </main>
     </div>
 </div>
+<script th:inline="javascript">
+    const chartData = /*[[${chartData}]]*/ {};
+    const canvas = document.getElementById('dashboardChart');
+    if (canvas && chartData.labels) {
+        const context = canvas.getContext('2d');
+        const gradientActivity = context.createLinearGradient(0, 0, 0, 320);
+        gradientActivity.addColorStop(0, 'rgba(79, 70, 229, 0.28)');
+        gradientActivity.addColorStop(1, 'rgba(79, 70, 229, 0.02)');
+
+        const gradientRegistration = context.createLinearGradient(0, 0, 0, 320);
+        gradientRegistration.addColorStop(0, 'rgba(20, 184, 166, 0.24)');
+        gradientRegistration.addColorStop(1, 'rgba(20, 184, 166, 0.02)');
+
+        new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [
+                    {
+                        label: '新增活动',
+                        data: chartData.activityCounts,
+                        borderColor: '#4f46e5',
+                        backgroundColor: gradientActivity,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#4f46e5',
+                        fill: true,
+                        tension: 0.38
+                    },
+                    {
+                        label: '新增报名',
+                        data: chartData.registrationCounts,
+                        borderColor: '#14b8a6',
+                        backgroundColor: gradientRegistration,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#14b8a6',
+                        fill: true,
+                        tension: 0.38
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            color: '#334155',
+                            padding: 18
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            color: '#64748b'
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.16)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
 </body>
 </html>
