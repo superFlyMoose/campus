@@ -13,11 +13,9 @@ public class ActivityRegistration {
 
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
-
     private Long activityId;
     private Long userId;
     private LocalDateTime registrationTime;
-
     @TableLogic
     private Integer isDeleted;
 }
