@@ -44,7 +44,7 @@ public class RegistrationController {
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/user/profile";
+        return "redirect:/";
     }
 
     private SysUser getCurrentUser(Authentication authentication) {

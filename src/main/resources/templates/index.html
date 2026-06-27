@@ -488,6 +488,12 @@
     <div class="alert alert-warning border-0 shadow-sm rounded-4" th:if="${param.denied}">
         您当前没有管理端访问权限
     </div>
+    <div class="alert alert-danger border-0 shadow-sm rounded-4" th:if="${errorMessage}" th:text="${errorMessage}">
+        操作失败
+    </div>
+    <div class="alert alert-success border-0 shadow-sm rounded-4" th:if="${successMessage}" th:text="${successMessage}">
+        操作成功
+    </div>
 
     <section class="hero-shell mb-4 mb-lg-5">
         <div class="hero-panel">
