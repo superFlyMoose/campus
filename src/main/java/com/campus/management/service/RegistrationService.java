@@ -62,13 +62,12 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
     @Transactional
     public void register(Long activityId, SysUser currentUser) {
         Activity activity = activityService.getActivityOrThrow(activityId);
-        boolean exists = lambdaQuery()
-            .eq(ActivityRegistration::getActivityId, activityId)
-            .eq(ActivityRegistration::getUserId, currentUser.getId())
-            .eq(ActivityRegistration::getIsDeleted, 0)
-            .count() > 0;
+        boolean exists = hasRegistered(activityId, currentUser.getId());
         if (exists) {
-            throw new IllegalArgumentException("您已报名该活动");
+            throw new IllegalArgumentException("已报名，不可重复报名！");
+        }
+        if (activity.getStartTime() != null && !activity.getStartTime().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("活动已开始，无法报名！");
         }
         if (!activityService.canRegister(activity)) {
             throw new IllegalArgumentException("当前活动无法报名");
@@ -110,6 +109,14 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         dashboardCacheService.evictDashboardCache();
         profileCacheService.evictProfileCache(currentUser.getId());
         activityCacheService.evictAllActivityCaches();
+    }
+
+    public boolean hasRegistered(Long activityId, Long userId) {
+        return lambdaQuery()
+            .eq(ActivityRegistration::getActivityId, activityId)
+            .eq(ActivityRegistration::getUserId, userId)
+            .eq(ActivityRegistration::getIsDeleted, 0)
+            .count() > 0;
     }
 
     private void fillActivityTitles(List<ActivityRegistration> registrations) {

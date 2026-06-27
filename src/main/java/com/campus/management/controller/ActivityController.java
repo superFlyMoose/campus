@@ -3,9 +3,13 @@ package com.campus.management.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.campus.management.dto.ActivityForm;
 import com.campus.management.entity.Activity;
+import com.campus.management.entity.SysUser;
 import com.campus.management.service.ActivityCacheService;
 import com.campus.management.service.ActivityService;
+import com.campus.management.service.RegistrationService;
+import com.campus.management.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,10 +27,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ActivityController {
     private final ActivityService activityService;
     private final ActivityCacheService activityCacheService;
+    private final RegistrationService registrationService;
+    private final UserService userService;
 
-    public ActivityController(ActivityService activityService, ActivityCacheService activityCacheService) {
+    public ActivityController(ActivityService activityService,
+                              ActivityCacheService activityCacheService,
+                              RegistrationService registrationService,
+                              UserService userService) {
         this.activityService = activityService;
         this.activityCacheService = activityCacheService;
+        this.registrationService = registrationService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -46,13 +57,20 @@ public class ActivityController {
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, Authentication authentication, Model model) {
         Activity activity = activityCacheService.getActivityDetail(id);
         if (activity == null) {
             activity = activityService.getActivityOrThrow(id);
             activityCacheService.cacheActivityDetail(activity);
         }
         model.addAttribute("activity", activity);
+        model.addAttribute("canRegister", activityService.canRegister(activity));
+        if (authentication != null) {
+            SysUser currentUser = userService.findByUsername(authentication.getName());
+            model.addAttribute("hasRegistered", registrationService.hasRegistered(id, currentUser.getId()));
+        } else {
+            model.addAttribute("hasRegistered", false);
+        }
         return "activity/detail";
     }
 
