@@ -235,6 +235,66 @@
             box-shadow: var(--shadow-card);
         }
 
+        .table-shell,
+        .state-shell {
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: var(--radius-xl);
+            background: rgba(255,255,255,0.36);
+            box-shadow: var(--shadow-soft);
+            padding: 0.65rem;
+        }
+
+        .table-panel,
+        .state-panel {
+            border-radius: calc(var(--radius-xl) - 10px);
+            background: var(--surface);
+            border: 1px solid var(--line-soft);
+            padding: 1.75rem;
+        }
+
+        .table-wrap {
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            overflow: hidden;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: rgba(79, 70, 229, 0.06);
+            color: #334155;
+            font-size: 0.84rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-bottom-width: 1px;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .table > :not(caption) > * > * {
+            padding: 1rem;
+            border-bottom-color: rgba(148, 163, 184, 0.12);
+        }
+
+        .badge-soft {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.45rem 0.75rem;
+            border-radius: 999px;
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--brand-primary);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .empty-panel {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
         .activity-panel:hover {
             transform: translateY(-6px);
             box-shadow: 0 26px 50px rgba(79, 70, 229, 0.16);
@@ -322,16 +382,14 @@
 
             .hero-panel,
             .section-panel,
-            .cta-panel {
+            .cta-panel,
+            .table-panel,
+            .state-panel {
                 padding: 1.5rem;
             }
 
             .section-heading {
                 flex-direction: column;
-            }
-
-            .chart-wrap {
-                height: 280px;
             }
         }
     </style>
@@ -426,6 +484,48 @@
         </div>
     </section>
 
+    <section class="table-shell mb-4" th:if="${#authorization.expression('isAuthenticated()') and !#lists.isEmpty(registrations)}">
+        <div class="table-panel">
+            <div class="section-heading">
+                <div>
+                    <div class="section-kicker">我的参与</div>
+                    <h2 class="section-title mb-2">我的报名</h2>
+                    <p class="section-copy">最新活动下方同步展示你的报名记录，便于快速查看与取消报名。</p>
+                </div>
+                <a class="btn btn-outline-primary rounded-pill px-4" th:href="@{/user/profile}">查看个人中心</a>
+            </div>
+            <div class="table-wrap table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                    <tr>
+                        <th>报名ID</th>
+                        <th>活动ID</th>
+                        <th>报名时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="registration : ${registrations}">
+                        <td th:text="${registration.id}">1</td>
+                        <td th:text="${registration.activityId}">1</td>
+                        <td th:text="${#temporals.format(registration.registrationTime, 'yyyy-MM-dd HH:mm')}">时间</td>
+                        <td><span class="badge-soft">已报名</span></td>
+                        <td>
+                            <form th:action="@{|/registrations/${registration.id}/cancel|}" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">取消报名</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="state-shell mb-4" th:if="${#authorization.expression('isAuthenticated()') and #lists.isEmpty(registrations)}">
+        <div class="state-panel empty-panel">暂无报名记录，快去活动大厅发现感兴趣的活动吧。</div>
+    </section>
 
     <section class="cta-shell">
         <div class="cta-panel">
