@@ -190,7 +190,7 @@
         <div class="page-panel">
             <span class="eyebrow">Activity Editor</span>
             <h1 class="page-title" th:text="${pageTitle}">活动表单</h1>
-            <p class="page-copy">在这里，您可对活动名称、时间、地点、人数与内容进行完整维护。</p>
+            <p class="page-copy">在这里，您可对活动名称、时间、地点、人数与内容进行完整维护</p>
         </div>
     </section>
 
@@ -203,7 +203,7 @@
                         <div class="group-shell mb-3">
                             <div class="group-panel">
                                 <div class="group-title">基础信息</div>
-                                <div class="group-copy">请设置活动最核心的标题与地点信息，确保用户能快速识别活动内容。</div>
+                                <div class="group-copy">请设置活动最核心的标题与地点信息，确保用户能快速识别活动内容</div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label">活动名称</label>
@@ -222,7 +222,7 @@
                         <div class="group-shell mb-3">
                             <div class="group-panel">
                                 <div class="group-title">时间与容量</div>
-                                <div class="group-copy">请明确活动开始、结束时间以及人数上限。</div>
+                                <div class="group-copy">请明确活动开始、结束时间以及人数上限</div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label">开始时间</label>
@@ -246,13 +246,13 @@
                         <div class="group-shell mb-3">
                             <div class="group-panel">
                                 <div class="group-title">活动图片</div>
-                                <div class="group-copy">请上传活动海报或现场图片。</div>
+                                <div class="group-copy">请上传活动海报或现场图片</div>
                                 <div class="row g-3 align-items-start">
                                     <div class="col-lg-7">
                                         <label class="form-label">活动图片</label>
                                         <input type="file" name="imageFile" class="form-control" accept=".jpg,.jpeg,.png,.gif,.webp">
                                         <input type="hidden" th:field="*{imagePath}">
-                                        <div class="helper-text">支持 JPG、PNG、GIF、WEBP；未重新上传时保留当前图片。</div>
+                                        <div class="helper-text">支持 JPG、PNG、GIF、WEBP；未重新上传时保留当前图片</div>
                                     </div>
                                     <div class="col-lg-5" th:if="${activityForm.imagePath != null and !#strings.isEmpty(activityForm.imagePath)}">
                                         <img th:src="${activityForm.imagePath}" alt="活动图片预览" class="image-preview">
@@ -264,7 +264,7 @@
                         <div class="group-shell mb-4">
                             <div class="group-panel">
                                 <div class="group-title">活动内容</div>
-                                <div class="group-copy">请详细描述活动流程、参与方式与注意事项，提升用户在详情页中的阅读体验。</div>
+                                <div class="group-copy">请详细描述活动流程、参与方式与注意事项，提升用户在详情页中的阅读体验</div>
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label class="form-label">活动内容</label>

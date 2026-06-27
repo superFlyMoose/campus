@@ -257,7 +257,7 @@
             <div class="position-relative hero-layout" style="z-index: 1;">
                 <div class="hero-main">
                     <h1 class="hero-title" th:text="${activity.title}">活动标题</h1>
-                    <p class="hero-copy">查看活动时间、地点、人数信息与详细内容，帮助您第一时间了解详情。</p>
+                    <p class="hero-copy">查看活动时间、地点、人数信息与详细内容，帮助您第一时间了解详情</p>
                     <div class="hero-actions d-flex flex-column flex-sm-row gap-3">
                         <a th:href="@{/activities}" class="btn btn-light btn-pill">返回列表</a>
                         <form th:action="@{|/registrations/activity/${activity.id}|}" method="post">
@@ -278,7 +278,7 @@
                 <div class="content-panel d-flex flex-column h-100">
                     <div class="section-kicker">活动介绍</div>
                     <h2 class="section-title">了解这场活动的核心内容</h2>
-                    <p class="section-copy">在报名前先确认活动安排与参与价值，确保时间与地点都符合您的计划哦。</p>
+                    <p class="section-copy">在报名前先确认活动安排与参与价值，确保时间与地点都符合您的计划</p>
                     <div class="content-box" th:text="${activity.content}">活动内容</div>
                 </div>
             </section>
@@ -308,7 +308,7 @@
                     </div>
                     <div class="apply-box">
                         <h3 class="h5 fw-bold mb-2">准备参与这场活动？</h3>
-                        <p>确认信息无误后可直接提交报名，系统将记录您的参与信息。</p>
+                        <p>确认信息无误后可直接提交报名，系统将记录您的参与信息</p>
                         <form th:action="@{|/registrations/activity/${activity.id}|}" method="post">
                             <button type="submit" class="btn btn-premium btn-pill text-white w-100">立即报名</button>
                         </form>

@@ -243,21 +243,21 @@
                 <div class="brand-panel d-flex flex-column justify-content-between">
                     <div>
                         <span class="eyebrow">Create Account</span>
-                        <h1 class="brand-title">创建你的校园活动账户，开始参与与连接。</h1>
-                        <p class="brand-copy">注册后即可查看活动详情、完成报名、维护个人资料。</p>
+                        <h1 class="brand-title">创建你的校园活动账户，开始参与与连接</h1>
+                        <p class="brand-copy">注册后即可查看活动详情、完成报名、维护个人资料</p>
                     </div>
                     <div class="brand-grid">
                         <div class="brand-stat">
                             <strong>统一身份入口</strong>
-                            <span>学生用户与管理用户都在同一系统完成核心操作。</span>
+                            <span>学生用户与管理用户都在同一系统完成核心操作</span>
                         </div>
                         <div class="brand-stat">
                             <strong>顺畅参与路径</strong>
-                            <span>从注册到账户使用，保持最少干扰与清晰反馈。</span>
+                            <span>从注册到账户使用，保持最少干扰与清晰反馈</span>
                         </div>
                         <div class="brand-stat">
                             <strong>面向校园场景</strong>
-                            <span>更适合活动发布、组织协作与个人报名记录管理。</span>
+                            <span>更适合活动发布、组织协作与个人报名记录管理</span>
                         </div>
                     </div>
                 </div>
@@ -267,7 +267,7 @@
                     <a th:href="@{/}" class="back-link mb-4">← 返回首页</a>
                     <div class="auth-kicker">New Account</div>
                     <h2 class="auth-title">用户注册</h2>
-                    <p class="auth-copy">填写以下信息，创建一个可用于报名和管理活动的系统账号。</p>
+                    <p class="auth-copy">填写以下信息，创建一个可用于报名和管理活动的系统账号</p>
                     <div class="alert alert-danger border-0 rounded-4" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}">错误信息</div>
                     <form th:action="@{/register}" th:object="${registerForm}" method="post">
                         <div class="section-card">

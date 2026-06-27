@@ -6,6 +6,8 @@ import com.campus.management.entity.SysUser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
@@ -51,6 +53,7 @@ public class ProfileCacheService {
         cacheData.setRole(user.getRole());
         cacheData.setAvatar(user.getAvatar());
         cacheData.setRegistrations(toRegistrationCacheItems(registrations));
+        cacheData.setDailyRegistrationChart(buildDailyRegistrationChart(registrations));
         String cacheKey = buildProfileCacheKey(user.getId());
         try {
             String cacheValue = objectMapper.writeValueAsString(cacheData);
@@ -104,8 +107,34 @@ public class ProfileCacheService {
             .toList();
     }
 
+    private ProfileCacheData.DailyRegistrationChart buildDailyRegistrationChart(List<ActivityRegistration> registrations) {
+        ProfileCacheData.DailyRegistrationChart chart = new ProfileCacheData.DailyRegistrationChart();
+        LocalDate today = LocalDate.now();
+        List<String> labels = new ArrayList<>();
+        List<Long> counts = new ArrayList<>();
+        long todayCount = 0L;
+
+        for (int hour = 0; hour < 24; hour++) {
+            labels.add(String.format("%02d:00", hour));
+            final int currentHour = hour;
+            long count = registrations == null ? 0L : registrations.stream()
+                .filter(registration -> registration.getRegistrationTime() != null)
+                .filter(registration -> registration.getRegistrationTime().toLocalDate().isEqual(today))
+                .filter(registration -> registration.getRegistrationTime().getHour() == currentHour)
+                .count();
+            counts.add(count);
+            todayCount += count;
+        }
+
+        chart.setLabels(labels);
+        chart.setCounts(counts);
+        chart.setTodayCount(todayCount);
+        return chart;
+    }
+
     private String buildProfileCacheKey(Long userId) {
         return PROFILE_CACHE_KEY_PREFIX + userId;
     }
 }
+
 

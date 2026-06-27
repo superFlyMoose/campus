@@ -440,7 +440,7 @@
             <div class="d-flex flex-column flex-xl-row justify-content-between gap-4 position-relative" style="z-index: 1;">
                 <div>
                     <h1 class="page-title">活动大厅</h1>
-                    <p class="page-copy">这里将为您提供所有校园内正在开放的活动，可按名称与地点快速筛选您心仪的活动。</p>
+                    <p class="page-copy">这里将为您提供所有校园内正在开放的活动，可按名称与地点快速筛选您心仪的活动</p>
                     <div class="d-flex flex-column flex-sm-row gap-3">
                         <a th:href="@{/}" class="btn btn-light btn-pill">返回首页</a>
                         <a th:href="@{/admin/dashboard}" class="btn btn-outline-light btn-pill" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">进入管理端</a>
@@ -470,7 +470,7 @@
             <div class="section-heading">
                 <div>
                     <h2>活动筛选</h2>
-                    <p>使用关键词和地点快速缩小范围，定位您最钟意的校园活动。</p>
+                    <p>使用关键词和地点快速缩小范围，定位您最钟意的校园活动</p>
                 </div>
             </div>
             <form class="row filter-grid align-items-end" method="get" th:action="@{/activities}">
@@ -508,7 +508,7 @@
                             <br>
                             <div>
                                 <h3 class="h5 fw-bold mb-2" th:text="${activity.title}">活动标题</h3>
-                                <small>报名信息与时间安排将在详情页继续展开。</small>
+                                <small>报名信息与时间安排将在详情页继续展开</small>
                             </div>
                         </div>
                         <div class="activity-title" th:text="${activity.title}">活动标题</div>
@@ -572,7 +572,7 @@
     <section class="empty-shell" th:if="${pageData.total == 0}">
         <div class="empty-panel">
             <h2 class="h4 fw-bold mb-3">暂无符合条件的活动</h2>
-            <p class="mb-0">请调整筛选条件，或等待新的校园活动发布后再次查看。</p>
+            <p class="mb-0">请调整筛选条件，或等待新的校园活动发布后再次查看</p>
         </div>
     </section>
 </div>

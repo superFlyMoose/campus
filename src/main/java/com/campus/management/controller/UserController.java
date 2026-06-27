@@ -31,13 +31,16 @@ public class UserController {
         if (cachedProfile != null) {
             model.addAttribute("currentUser", toCurrentUser(cachedProfile));
             model.addAttribute("registrations", toRegistrations(cachedProfile));
+            model.addAttribute("dailyRegistrationChart", cachedProfile.getDailyRegistrationChart());
             return "user/profile";
         }
 
         List<ActivityRegistration> registrations = registrationService.getMyRegistrations(currentUser.getId());
         profileCacheService.cacheProfile(currentUser, registrations);
+        ProfileCacheData profileData = profileCacheService.getProfile(currentUser.getId());
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("registrations", registrations);
+        model.addAttribute("dailyRegistrationChart", profileData != null ? profileData.getDailyRegistrationChart() : null);
         return "user/profile";
     }
 
@@ -69,3 +72,4 @@ public class UserController {
             .toList();
     }
 }
+

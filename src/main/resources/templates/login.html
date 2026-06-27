@@ -216,20 +216,20 @@
                     <div>
                         <span class="eyebrow">Campus Activity</span>
                         <h1 class="brand-title">重新进入你的校园活动工作台。</h1>
-                        <p class="brand-copy">快速查看活动动态、报名情况与个人参与记录，在统一入口中完成浏览、报名与管理。</p>
+                        <p class="brand-copy">快速查看活动动态、报名情况与个人参与记录，在统一入口中完成浏览、报名与管理</p>
                     </div>
                     <div class="brand-list">
                         <div class="brand-item">
                             <strong>发现活动</strong>
-                            <span>第一时间获取校园内值得参与的活动信息。</span>
+                            <span>第一时间获取校园内值得参与的活动信息</span>
                         </div>
                         <div class="brand-item">
                             <strong>统一管理</strong>
-                            <span>组织者与管理员可在同一系统内管理活动与用户。</span>
+                            <span>组织者与管理员可在同一系统内管理活动与用户</span>
                         </div>
                         <div class="brand-item">
                             <strong>轻量高效</strong>
-                            <span>保持操作直观，减少用户的查找成本。</span>
+                            <span>保持操作直观，减少用户的查找成本</span>
                         </div>
                     </div>
                 </div>
@@ -239,12 +239,12 @@
                     <a th:href="@{/}" class="back-link mb-4">← 返回首页</a>
                     <div class="auth-kicker">Account Access</div>
                     <h2 class="auth-title">用户登录</h2>
-                    <p class="auth-copy">请输入账号信息以继续访问校园活动管理系统。</p>
+                    <p class="auth-copy">请输入账号信息以继续访问校园活动管理系统</p>
                     <div class="alert alert-danger border-0 rounded-4" th:if="${param.error}">
-                        用户名或密码错误，请检查后重试。
+                        用户名或密码错误，请检查后重试！
                     </div>
                     <div class="alert alert-success border-0 rounded-4" th:if="${param.logout}">
-                        已安全退出登录。
+                        已安全退出登录！
                     </div>
                     <form th:action="@{/login}" method="post">
                         <div class="mb-3">

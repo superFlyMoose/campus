@@ -169,31 +169,6 @@
             margin-bottom: 1.75rem;
         }
 
-        .hero-stat-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .hero-stat {
-            padding: 1rem 1.1rem;
-            border-radius: 22px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .hero-stat-label {
-            display: block;
-            color: rgba(255,255,255,0.72);
-            font-size: 0.84rem;
-            margin-bottom: 0.4rem;
-        }
-
-        .hero-stat-value {
-            font-size: 1.6rem;
-            font-weight: 700;
-        }
 
         .section-panel,
         .cta-panel {
@@ -295,6 +270,90 @@
             color: var(--text-muted);
         }
 
+        .pagination-shell {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination-premium {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+            padding: 0.45rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.78);
+            border: 1px solid rgba(99, 102, 241, 0.14);
+            box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+        }
+
+        .pagination-premium .page-item + .page-item {
+            margin-left: 0;
+        }
+
+        .pagination-premium .page-link {
+            border: 0;
+            border-radius: 100%;
+            border-right: 1px solid rgba(99, 102, 241, 0.08);
+            color: var(--text-muted);
+            background: transparent;
+            padding: 0.72rem 1rem;
+            min-width: 46px;
+            text-align: center;
+            box-shadow: none;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+
+        .pagination-premium .page-item:last-child .page-link {
+            border-right: 0;
+        }
+
+        .pagination-premium .page-link:hover {
+            color: var(--brand-primary-dark);
+            background-color: rgba(79, 70, 229, 0.08);
+        }
+
+        .pagination-premium .page-item.active .page-link {
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, var(--brand-primary), #7c3aed);
+            color: #fff;
+            box-shadow: 0 14px 28px rgba(79, 70, 229, 0.2);
+        }
+
+        .pagination-premium .page-item.disabled .page-link {
+            color: #a8b2c7;
+            background: rgba(148, 163, 184, 0.08);
+            box-shadow: none;
+            pointer-events: none;
+        }
+
+        .pagination-premium .page-item-nav .page-link {
+            min-width: 112px;
+            color: var(--text-strong);
+            background: rgba(79, 70, 229, 0.05);
+            font-weight: 700;
+        }
+
+        .pagination-premium .page-item-nav .page-link:hover,
+        .pagination-premium .page-item-nav .page-link:focus {
+            color: var(--brand-primary-dark);
+            background: rgba(79, 70, 229, 0.10);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .pagination-premium .page-item-nav:first-child .page-link {
+            border-radius: 999px 0 0 999px;
+        }
+
+        .pagination-premium .page-item-nav:last-child .page-link {
+            border-radius: 0 999px 999px 0;
+        }
+
         .activity-panel:hover {
             transform: translateY(-6px);
             box-shadow: 0 26px 50px rgba(79, 70, 229, 0.16);
@@ -319,7 +378,6 @@
             font-size: 0.95rem;
             margin-bottom: 1.5rem;
         }
-
 
         .cta-panel {
             display: flex;
@@ -365,10 +423,6 @@
                 padding: 2rem;
             }
 
-            .hero-stat-grid {
-                grid-template-columns: 1fr;
-            }
-
             .cta-panel {
                 flex-direction: column;
                 align-items: flex-start;
@@ -390,6 +444,19 @@
 
             .section-heading {
                 flex-direction: column;
+            }
+
+            .pagination-premium {
+                flex-wrap: wrap;
+                border-radius: 24px;
+                justify-content: center;
+            }
+
+            .pagination-premium .page-link,
+            .pagination-premium .page-item-nav:first-child .page-link,
+            .pagination-premium .page-item-nav:last-child .page-link {
+                border-radius: 999px;
+                border-right: 0;
             }
         }
     </style>
@@ -419,7 +486,7 @@
 
 <div class="container py-4 py-lg-5">
     <div class="alert alert-warning border-0 shadow-sm rounded-4" th:if="${param.denied}">
-        您当前没有管理端访问权限。
+        您当前没有管理端访问权限
     </div>
 
     <section class="hero-shell mb-4 mb-lg-5">
@@ -427,8 +494,8 @@
             <span class="eyebrow">Campus Activity Platform</span>
             <div class="row align-items-center g-4 position-relative" style="z-index: 1;">
                 <div class="col-lg-7">
-                    <h1 class="hero-title">把校园里的每一次参与、组织与发现，汇聚成清晰而有温度的活动体验。</h1>
-                    <p class="hero-copy">从热门活动浏览到即时参与，这里为学生与管理者提供统一、直观的校园活动平台。</p>
+                    <h1 class="hero-title">把校园里的每一次参与、组织与发现，汇聚成清晰而有温度的活动体验</h1>
+                    <p class="hero-copy">从热门活动浏览到即时参与，这里为学生与管理者提供统一、直观的校园活动平台</p>
                     <div class="d-flex flex-column flex-sm-row gap-3">
                         <a class="btn btn-light btn-lg cta-btn-light" th:href="@{/activities}">浏览活动</a>
                         <a class="btn btn-outline-light btn-lg rounded-pill px-4" style="align-content: center" th:href="@{/admin/dashboard}" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">进入管理端</a>
@@ -445,7 +512,7 @@
                 <div>
                     <div class="section-kicker">精选推荐</div>
                     <h2 class="section-title mb-2">最新活动</h2>
-                    <p class="section-copy">浏览当前最值得关注的校园活动，快速锁定正在发生的校园热点。</p>
+                    <p class="section-copy">浏览当前最值得关注的校园活动，快速锁定正在发生的校园热点</p>
                 </div>
                 <a class="btn btn-outline-primary rounded-pill px-4" th:href="@{/activities}">进入活动大厅</a>
             </div>
@@ -480,19 +547,18 @@
                     <span class="visually-hidden">下一页</span>
                 </button>
             </div>
-            <div class="text-secondary fs-6" th:if="${#lists.isEmpty(hotActivities)}">暂无活动数据，请先在管理端创建活动。</div>
+            <div class="text-secondary fs-6" th:if="${#lists.isEmpty(hotActivities)}">暂无活动数据</div>
         </div>
     </section>
 
-    <section class="table-shell mb-4" th:if="${#authorization.expression('isAuthenticated()') and !#lists.isEmpty(registrations)}">
+    <section class="table-shell mb-4" th:if="${#authorization.expression('isAuthenticated()') and registrationPage != null and registrationPage.total > 0}">
         <div class="table-panel">
             <div class="section-heading">
                 <div>
                     <div class="section-kicker">我的参与</div>
                     <h2 class="section-title mb-2">我的报名</h2>
-                    <p class="section-copy">最新活动下方同步展示你的报名记录，便于快速查看与取消报名。</p>
+                    <p class="section-copy" th:text="|共 ${registrationPage.total} 条记录, 每页 5 条, 当前第 ${registrationPage.current} / ${registrationPage.pages} 页|">分页信息</p>
                 </div>
-                <a class="btn btn-outline-primary rounded-pill px-4" th:href="@{/user/profile}">查看个人中心</a>
             </div>
             <div class="table-wrap table-responsive">
                 <table class="table align-middle">
@@ -506,7 +572,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="registration : ${registrations}">
+                    <tr th:each="registration : ${registrationPage.records}">
                         <td th:text="${registration.id}">1</td>
                         <td th:text="${registration.activityId}">1</td>
                         <td th:text="${#temporals.format(registration.registrationTime, 'yyyy-MM-dd HH:mm')}">时间</td>
@@ -520,10 +586,27 @@
                     </tbody>
                 </table>
             </div>
+            <div class="pagination-shell">
+                <nav aria-label="首页报名记录分页导航">
+                    <ul class="pagination pagination-premium mb-0 align-items-center">
+                        <li class="page-item page-item-nav" th:classappend="${registrationPage.current == 1} ? ' disabled'">
+                            <a class="page-link" th:href="@{/(registrationPage=${registrationPage.current - 1})}" aria-label="上一页">上一页</a>
+                        </li>
+                        <li class="page-item"
+                            th:each="pageNumber : ${#numbers.sequence(1, T(java.lang.Math).max(1, T(java.lang.Math).toIntExact(registrationPage.pages)))}"
+                            th:classappend="${pageNumber == registrationPage.current} ? ' active'">
+                            <a class="page-link" th:href="@{/(registrationPage=${pageNumber})}" th:text="${pageNumber}">1</a>
+                        </li>
+                        <li class="page-item page-item-nav" th:classappend="${registrationPage.current == registrationPage.pages} ? ' disabled'">
+                            <a class="page-link" th:href="@{/(registrationPage=${registrationPage.current + 1})}" aria-label="下一页">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </section>
 
-    <section class="state-shell mb-4" th:if="${#authorization.expression('isAuthenticated()') and #lists.isEmpty(registrations)}">
+    <section class="state-shell mb-4" th:if="${#authorization.expression('isAuthenticated()') and (registrationPage == null or registrationPage.total == 0)}">
         <div class="state-panel empty-panel">暂无报名记录，快去活动大厅发现感兴趣的活动吧。</div>
     </section>
 

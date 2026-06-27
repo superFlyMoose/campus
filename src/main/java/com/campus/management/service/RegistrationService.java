@@ -1,6 +1,7 @@
 package com.campus.management.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.campus.management.config.RabbitMqConfig;
 import com.campus.management.dto.ActivityMessage;
@@ -40,6 +41,15 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
             .eq(ActivityRegistration::getIsDeleted, 0)
             .orderByDesc(ActivityRegistration::getRegistrationTime)
             .list();
+    }
+
+    public Page<ActivityRegistration> pageMyRegistrations(Long userId, int pageNum, int pageSize) {
+        Page<ActivityRegistration> page = new Page<>(Math.max(pageNum, 1), pageSize);
+        return lambdaQuery()
+            .eq(ActivityRegistration::getUserId, userId)
+            .eq(ActivityRegistration::getIsDeleted, 0)
+            .orderByDesc(ActivityRegistration::getRegistrationTime)
+            .page(page);
     }
 
     @Transactional

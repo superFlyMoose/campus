@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人中心</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --brand-primary: #4f46e5;
@@ -29,9 +30,9 @@
 
         .hero-shell,
         .profile-shell,
-        .table-shell,
         .state-shell,
-        .summary-shell {
+        .summary-shell,
+        .chart-shell {
             border-radius: 28px;
             border: 1px solid rgba(255,255,255,0.9);
             background: rgba(255,255,255,0.4);
@@ -41,9 +42,9 @@
 
         .hero-panel,
         .profile-panel,
-        .table-panel,
         .state-panel,
-        .summary-panel {
+        .summary-panel,
+        .chart-panel {
             border-radius: 22px;
             border: 1px solid var(--line-soft);
             background: var(--surface);
@@ -102,9 +103,9 @@
         }
 
         .profile-panel,
-        .table-panel,
         .state-panel,
-        .summary-panel {
+        .summary-panel,
+        .chart-panel {
             padding: 1.5rem;
         }
 
@@ -192,9 +193,12 @@
             margin-bottom: 0.35rem;
         }
 
-
         .summary-panel {
             background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,242,255,0.86));
+        }
+
+        .chart-panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,255,0.92));
         }
 
         .summary-grid {
@@ -222,30 +226,27 @@
             font-weight: 700;
         }
 
-        .table-wrap {
-            border-radius: 20px;
-            border: 1px solid rgba(148, 163, 184, 0.14);
-            overflow: hidden;
+        .chart-wrap {
+            height: 320px;
         }
 
-        .table {
-            margin-bottom: 0;
+        .chart-summary {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+            color: var(--text-muted);
+            font-size: 0.92rem;
         }
 
-        .table thead th {
-            background: rgba(79, 70, 229, 0.06);
-            color: #334155;
-            font-size: 0.84rem;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            border-bottom-width: 1px;
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-        }
-
-        .table > :not(caption) > * > * {
-            padding: 1rem;
-            border-bottom-color: rgba(148, 163, 184, 0.12);
+        .chart-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.45rem 0.78rem;
+            border-radius: 999px;
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--brand-primary);
+            font-weight: 700;
         }
 
         .empty-panel {
@@ -263,9 +264,9 @@
         @media (max-width: 767.98px) {
             .hero-panel,
             .profile-panel,
-            .table-panel,
             .state-panel,
             .summary-panel,
+            .chart-panel,
             .empty-panel {
                 padding: 1.35rem;
             }
@@ -289,7 +290,7 @@
             <div class="position-relative" style="z-index: 1;">
                 <span class="eyebrow">Personal Center</span>
                 <h1 class="hero-title">个人中心</h1>
-                <p class="hero-copy">集中查看个人资料与报名记录。</p>
+                <p class="hero-copy">集中查看个人资料与我的报名趋势。</p>
                 <a th:href="@{/}" class="btn btn-light btn-pill">返回首页</a>
             </div>
         </div>
@@ -333,8 +334,8 @@
                     </div>
                     <div class="summary-grid">
                         <div class="summary-item">
-                            <span class="summary-label">报名记录</span>
-                            <span class="summary-value" th:text="${registrations.size()}">0</span>
+                            <span class="summary-label">我的今日报名数量</span>
+                            <span class="summary-value" th:text="${dailyRegistrationChart != null ? dailyRegistrationChart.todayCount : 0}">0</span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">资料状态</span>
@@ -351,43 +352,90 @@
             <div class="alert alert-success border-0 shadow-sm rounded-4" th:if="${successMessage}" th:text="${successMessage}">成功</div>
             <div class="alert alert-danger border-0 shadow-sm rounded-4" th:if="${errorMessage}" th:text="${errorMessage}">失败</div>
 
-            <section class="table-shell" th:if="${!#lists.isEmpty(registrations)}">
-                <div class="table-panel">
+            <section class="chart-shell">
+                <div class="chart-panel">
                     <div class="section-head">
-                        <h2>我的报名</h2>
+                        <div>
+                            <h2>我的报名趋势</h2>
+                            <div class="chart-summary">
+                                <span class="chart-badge">我的今日总报名：<span th:text="${dailyRegistrationChart != null ? dailyRegistrationChart.todayCount : 0}">0</span></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="table-wrap table-responsive">
-                        <table class="table align-middle">
-                            <thead>
-                            <tr>
-                                <th>报名ID</th>
-                                <th>活动ID</th>
-                                <th>报名时间</th>
-                                <th>操作</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="registration : ${registrations}">
-                                <td th:text="${registration.id}">1</td>
-                                <td th:text="${registration.activityId}">1</td>
-                                <td th:text="${#temporals.format(registration.registrationTime, 'yyyy-MM-dd HH:mm')}">时间</td>
-                                <td>
-                                    <form th:action="@{|/registrations/${registration.id}/cancel|}" method="post">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger btn-pill">取消报名</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                    <div class="chart-wrap">
+                        <canvas id="profileRegistrationChart"></canvas>
                     </div>
                 </div>
-            </section>
-
-            <section class="state-shell" th:if="${#lists.isEmpty(registrations)}">
-                <div class="state-panel empty-panel">暂无报名记录。</div>
             </section>
         </div>
     </div>
 </div>
+<script th:inline="javascript">
+    const dailyRegistrationChart = /*[[${dailyRegistrationChart}]]*/ {};
+    const profileChartCanvas = document.getElementById('profileRegistrationChart');
+    if (profileChartCanvas && dailyRegistrationChart.labels) {
+        const context = profileChartCanvas.getContext('2d');
+        const gradientLine = context.createLinearGradient(0, 0, 0, 320);
+        gradientLine.addColorStop(0, 'rgba(79, 70, 229, 0.26)');
+        gradientLine.addColorStop(1, 'rgba(79, 70, 229, 0.02)');
+
+        new Chart(profileChartCanvas, {
+            type: 'line',
+            data: {
+                labels: dailyRegistrationChart.labels,
+                datasets: [{
+                    label: '我的报名数量',
+                    data: dailyRegistrationChart.counts,
+                    borderColor: '#4f46e5',
+                    backgroundColor: gradientLine,
+                    borderWidth: 3,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: '#4f46e5',
+                    fill: true,
+                    tension: 0.38
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            color: '#334155'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 12
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            color: '#64748b'
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.16)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
 </body>
 </html>
+
