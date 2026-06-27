@@ -1,12 +1,9 @@
 package com.campus.management.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 import java.time.LocalDateTime;
 
-import lombok.Data;
 @Data
 @TableName("activity_registration")
 public class ActivityRegistration {
@@ -14,7 +11,7 @@ public class ActivityRegistration {
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     private Long activityId;
-    @com.baomidou.mybatisplus.annotation.TableField(exist = false)
+    @TableField(exist = false)
     private String activityTitle;
     private Long userId;
     private LocalDateTime registrationTime;
