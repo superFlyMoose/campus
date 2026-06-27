@@ -11,6 +11,9 @@ import com.campus.management.entity.SysUser;
 import com.campus.management.mapper.ActivityRegistrationMapper;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,20 +39,24 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
     }
 
     public List<ActivityRegistration> getMyRegistrations(Long userId) {
-        return lambdaQuery()
+        List<ActivityRegistration> registrations = lambdaQuery()
             .eq(ActivityRegistration::getUserId, userId)
             .eq(ActivityRegistration::getIsDeleted, 0)
             .orderByDesc(ActivityRegistration::getRegistrationTime)
             .list();
+        fillActivityTitles(registrations);
+        return registrations;
     }
 
     public Page<ActivityRegistration> pageMyRegistrations(Long userId, int pageNum, int pageSize) {
         Page<ActivityRegistration> page = new Page<>(Math.max(pageNum, 1), pageSize);
-        return lambdaQuery()
+        Page<ActivityRegistration> registrationPage = lambdaQuery()
             .eq(ActivityRegistration::getUserId, userId)
             .eq(ActivityRegistration::getIsDeleted, 0)
             .orderByDesc(ActivityRegistration::getRegistrationTime)
             .page(page);
+        fillActivityTitles(registrationPage.getRecords());
+        return registrationPage;
     }
 
     @Transactional
@@ -105,6 +112,25 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         activityCacheService.evictAllActivityCaches();
     }
 
+    private void fillActivityTitles(List<ActivityRegistration> registrations) {
+        if (registrations == null || registrations.isEmpty()) {
+            return;
+        }
+        Set<Long> activityIds = registrations.stream()
+            .map(ActivityRegistration::getActivityId)
+            .filter(activityId -> activityId != null)
+            .collect(Collectors.toSet());
+        if (activityIds.isEmpty()) {
+            return;
+        }
+        Map<Long, String> activityTitleMap = activityService.listByIds(activityIds).stream()
+            .filter(activity -> !Integer.valueOf(1).equals(activity.getIsDeleted()))
+            .collect(Collectors.toMap(Activity::getId, Activity::getTitle, (left, right) -> left));
+        registrations.forEach(registration -> registration.setActivityTitle(
+            activityTitleMap.getOrDefault(registration.getActivityId(), "活动已删除")
+        ));
+    }
+
     private void sendRegistrationCreatedMessage(Activity activity, SysUser currentUser) {
         ActivityMessage message = new ActivityMessage();
         message.setEventType("REGISTRATION_CREATED");
@@ -117,4 +143,3 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         activityMessageProducer.send(RabbitMqConfig.REGISTRATION_CREATED_ROUTING_KEY, message);
     }
 }
-

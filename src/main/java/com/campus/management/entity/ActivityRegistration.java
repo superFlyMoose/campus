@@ -14,6 +14,8 @@ public class ActivityRegistration {
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     private Long activityId;
+    @com.baomidou.mybatisplus.annotation.TableField(exist = false)
+    private String activityTitle;
     private Long userId;
     private LocalDateTime registrationTime;
     @TableLogic

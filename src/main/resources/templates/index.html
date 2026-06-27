@@ -574,7 +574,7 @@
                     <tbody>
                     <tr th:each="registration : ${registrationPage.records}">
                         <td th:text="${registration.id}">1</td>
-                        <td th:text="${registration.activityId}">1</td>
+                        <td th:text="${registration.activityTitle}">活动名称</td>
                         <td th:text="${#temporals.format(registration.registrationTime, 'yyyy-MM-dd HH:mm')}">时间</td>
                         <td><span class="badge-soft">已报名</span></td>
                         <td>
