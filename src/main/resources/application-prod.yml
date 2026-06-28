@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.64.100:3306/campus_activity_management?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  thymeleaf:
+    cache: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 123456
+      database: 0
+      timeout: 5s
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 1000ms
+          max-attempts: 3
+
+  amqp:
+    deserialization:
+      trust:
+        all: false
+      trusted:
+        packages: com.campus.management.dto,java.util,java.lang,java.time
