@@ -105,7 +105,7 @@ public class DashboardService {
     }
 
     /**
-     * 构建近7天日期标签（用于图表X轴）
+     * 构建近7天日期标签
      */
     private List<String> buildDateLabels() {
         LinkedList<String> labels = new LinkedList<>();
