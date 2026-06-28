@@ -45,6 +45,9 @@ public class DashboardService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * 获取仪表盘核心统计摘要（用户数 / 活动数 / 报名数）
+     */
     public Map<String, Long> getSummary() {
         List<String> cachedValues = stringRedisTemplate.opsForList().range(SUMMARY_CACHE_KEY, 0, -1);
         if (cachedValues != null && cachedValues.size() == 3) {
@@ -63,6 +66,9 @@ public class DashboardService {
         return summary;
     }
 
+    /**
+     * 获取热门活动列表（首页展示模块）
+     */
     public List<Activity> getHotActivities() {
         String cachedJson = readHotActivitiesCacheSafely();
         if (cachedJson != null && !cachedJson.isBlank()) {
@@ -77,6 +83,10 @@ public class DashboardService {
         return activities;
     }
 
+    /**
+     * 获取图表数据（近7天趋势）
+     * 计算成本较高，因此必须缓存
+     */
     public Map<String, List<?>> getChartData() {
         String cachedJson = readChartCacheSafely();
         if (cachedJson != null && !cachedJson.isBlank()) {
@@ -94,6 +104,9 @@ public class DashboardService {
         return chartData;
     }
 
+    /**
+     * 构建近7天日期标签（用于图表X轴）
+     */
     private List<String> buildDateLabels() {
         LinkedList<String> labels = new LinkedList<>();
         for (int index = 6; index >= 0; index--) {
@@ -102,6 +115,13 @@ public class DashboardService {
         return labels;
     }
 
+    /**
+     * 统计近7天每日活动创建数量
+     *
+     * 查询方式：
+     * 按createTime进行时间范围过滤
+     * 每天执行一次COUNT
+     */
     private List<Long> buildDailyActivityCounts() {
         LinkedList<Long> counts = new LinkedList<>();
         for (int index = 6; index >= 0; index--) {
@@ -115,6 +135,9 @@ public class DashboardService {
         return counts;
     }
 
+    /**
+     * 统计近7天每日报名数量
+     */
     private List<Long> buildDailyRegistrationCounts() {
         LinkedList<Long> counts = new LinkedList<>();
         for (int index = 6; index >= 0; index--) {
@@ -128,6 +151,9 @@ public class DashboardService {
         return counts;
     }
 
+    /**
+     * 写入Summary缓存
+     */
     private void cacheSummary(Map<String, Long> summary) {
         stringRedisTemplate.delete(SUMMARY_CACHE_KEY);
         stringRedisTemplate.opsForList().rightPushAll(
@@ -139,6 +165,9 @@ public class DashboardService {
         stringRedisTemplate.expire(SUMMARY_CACHE_KEY, CACHE_TTL);
     }
 
+    /**
+     * 写入热门活动缓存
+     */
     private void cacheHotActivities(List<Activity> activities) {
         stringRedisTemplate.delete(HOT_ACTIVITY_CACHE_KEY);
         if (activities.isEmpty()) {
@@ -156,6 +185,9 @@ public class DashboardService {
         }
     }
 
+    /**
+     * 安全读取热门活动缓存
+     */
     private String readHotActivitiesCacheSafely() {
         try {
             return stringRedisTemplate.opsForValue().get(HOT_ACTIVITY_CACHE_KEY);
@@ -166,6 +198,9 @@ public class DashboardService {
         }
     }
 
+    /**
+     * 热门活动缓存反序列化
+     */
     private List<Activity> parseCachedActivities(String cachedJson) {
         try {
             List<HotActivityCacheItem> items = objectMapper.readValue(
@@ -180,6 +215,9 @@ public class DashboardService {
         }
     }
 
+    /**
+     * 降低缓存体积
+     */
     private HotActivityCacheItem toCacheItem(Activity activity) {
         HotActivityCacheItem item = new HotActivityCacheItem();
         item.setId(activity.getId());
@@ -203,6 +241,9 @@ public class DashboardService {
         return activity;
     }
 
+    /**
+     * 安全读取图标缓存
+     */
     private String readChartCacheSafely() {
         try {
             return stringRedisTemplate.opsForValue().get(CHART_CACHE_KEY);
@@ -213,6 +254,9 @@ public class DashboardService {
         }
     }
 
+    /**
+     * 写入图表缓存
+     */
     private void cacheChartData(Map<String, List<?>> chartData) {
         DashboardChartCacheData cacheData = new DashboardChartCacheData();
         cacheData.setLabels(castStringList(chartData.get("labels")));
@@ -226,6 +270,9 @@ public class DashboardService {
         }
     }
 
+    /**
+     * 图表缓存解析
+     */
     private Map<String, List<?>> parseChartData(String cachedJson) {
         try {
             DashboardChartCacheData cacheData = objectMapper.readValue(cachedJson, DashboardChartCacheData.class);
@@ -241,6 +288,9 @@ public class DashboardService {
         }
     }
 
+    /**
+     * 安全类型转换：List<?> -> List<String>
+     */
     private List<String> castStringList(List<?> values) {
         if (values == null || values.isEmpty()) {
             return Collections.emptyList();

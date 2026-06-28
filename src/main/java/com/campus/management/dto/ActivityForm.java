@@ -8,6 +8,10 @@ import java.time.LocalDateTime;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+/**
+ * 活动表单
+ */
+
 @Data
 public class ActivityForm {
 

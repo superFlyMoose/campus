@@ -38,6 +38,9 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         this.activityCacheService = activityCacheService;
     }
 
+    /**
+     * 获取当前用户所有报名记录
+     */
     public List<ActivityRegistration> getMyRegistrations(Long userId) {
         List<ActivityRegistration> registrations = lambdaQuery()
             .eq(ActivityRegistration::getUserId, userId)
@@ -48,6 +51,9 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         return registrations;
     }
 
+    /**
+     * 用户报名记录分页查询
+     */
     public Page<ActivityRegistration> pageMyRegistrations(Long userId, int pageNum, int pageSize) {
         Page<ActivityRegistration> page = new Page<>(Math.max(pageNum, 1), pageSize);
         Page<ActivityRegistration> registrationPage = lambdaQuery()
@@ -59,6 +65,9 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         return registrationPage;
     }
 
+    /**
+     * 用户报名活动
+     */
     @Transactional
     public void register(Long activityId, SysUser currentUser) {
         Activity activity = activityService.getActivityOrThrow(activityId);
@@ -72,22 +81,27 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         if (!activityService.canRegister(activity)) {
             throw new IllegalArgumentException("当前活动无法报名");
         }
-
+        // 创建报名记录
         ActivityRegistration registration = new ActivityRegistration();
         registration.setActivityId(activityId);
         registration.setUserId(currentUser.getId());
         registration.setRegistrationTime(LocalDateTime.now());
         registration.setIsDeleted(0);
         save(registration);
-
+        // 更新活动人数
         activity.setCurrentPeople(activity.getCurrentPeople() + 1);
         activityService.updateById(activity);
         dashboardCacheService.evictDashboardCache();
+        // 缓存失效
         profileCacheService.evictProfileCache(currentUser.getId());
         activityCacheService.evictAllActivityCaches();
+        // 异步事件通知
         sendRegistrationCreatedMessage(activity, currentUser);
     }
 
+    /**
+     * 用户取消报名
+     */
     @Transactional
     public void cancel(Long registrationId, SysUser currentUser) {
         ActivityRegistration registration = getOne(new LambdaQueryWrapper<ActivityRegistration>()
@@ -98,19 +112,24 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         if (registration == null) {
             throw new IllegalArgumentException("报名记录不存在");
         }
-
         Activity activity = activityService.getActivityOrThrow(registration.getActivityId());
         if (activity.getStartTime() != null && !activity.getStartTime().isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("活动开始后不可取消报名");
         }
+        // 删除报名记录
         removeById(registrationId);
+        // 回滚人数
         activity.setCurrentPeople(Math.max(0, activity.getCurrentPeople() - 1));
         activityService.updateById(activity);
+        // 缓存失效
         dashboardCacheService.evictDashboardCache();
         profileCacheService.evictProfileCache(currentUser.getId());
         activityCacheService.evictAllActivityCaches();
     }
 
+    /**
+     * 判断用户是否已报名某活动
+     */
     public boolean hasRegistered(Long activityId, Long userId) {
         return lambdaQuery()
             .eq(ActivityRegistration::getActivityId, activityId)
@@ -119,6 +138,9 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
             .count() > 0;
     }
 
+    /**
+     * 补充报名记录中的活动标题，避免前端二次查询
+     */
     private void fillActivityTitles(List<ActivityRegistration> registrations) {
         if (registrations == null || registrations.isEmpty()) {
             return;
@@ -138,6 +160,9 @@ public class RegistrationService extends ServiceImpl<ActivityRegistrationMapper,
         ));
     }
 
+    /**
+     * 发送“报名成功”事件消息
+     */
     private void sendRegistrationCreatedMessage(Activity activity, SysUser currentUser) {
         ActivityMessage message = new ActivityMessage();
         message.setEventType("REGISTRATION_CREATED");

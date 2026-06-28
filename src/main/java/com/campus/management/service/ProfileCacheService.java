@@ -31,6 +31,11 @@ public class ProfileCacheService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * 获取用户画像缓存
+     * @param userId 用户ID
+     * @return ProfileCacheData（缓存命中）或 null（未命中/异常）
+     */
     public ProfileCacheData getProfile(Long userId) {
         String cachedJson = readProfileCacheSafely(userId);
         if (cachedJson == null || cachedJson.isBlank()) {
@@ -45,13 +50,18 @@ public class ProfileCacheService {
         }
     }
 
+    /**
+     * 写入用户画像缓存
+     */
     public void cacheProfile(SysUser user, List<ActivityRegistration> registrations) {
         ProfileCacheData cacheData = new ProfileCacheData();
+        // 用户基础信息
         cacheData.setUserId(user.getId());
         cacheData.setUsername(user.getUsername());
         cacheData.setRealName(user.getRealName());
         cacheData.setRole(user.getRole());
         cacheData.setAvatar(user.getAvatar());
+        // 报名记录
         cacheData.setRegistrations(toRegistrationCacheItems(registrations));
         cacheData.setDailyRegistrationChart(buildDailyRegistrationChart(registrations));
         String cacheKey = buildProfileCacheKey(user.getId());
@@ -67,6 +77,9 @@ public class ProfileCacheService {
         }
     }
 
+    /**
+     * 删除用户画像缓存
+     */
     public void evictProfileCache(Long userId) {
         String cacheKey = buildProfileCacheKey(userId);
         try {
@@ -76,6 +89,13 @@ public class ProfileCacheService {
         }
     }
 
+    /**
+     * 安全读取缓存
+     *
+     * 容错策略：
+     * Redis异常 → 返回 null（降级走DB）
+     * 自动删除可能损坏缓存
+     */
     private String readProfileCacheSafely(Long userId) {
         String cacheKey = buildProfileCacheKey(userId);
         try {
@@ -90,6 +110,9 @@ public class ProfileCacheService {
         }
     }
 
+    /**
+     * 报名记录->缓存DTO转换
+     */
     private List<ProfileCacheData.RegistrationCacheItem> toRegistrationCacheItems(List<ActivityRegistration> registrations) {
         if (registrations == null || registrations.isEmpty()) {
             return Collections.emptyList();
@@ -107,6 +130,9 @@ public class ProfileCacheService {
             .toList();
     }
 
+    /**
+     * 构建用户报名行为时间分布图（24小时粒度）
+     */
     private ProfileCacheData.DailyRegistrationChart buildDailyRegistrationChart(List<ActivityRegistration> registrations) {
         ProfileCacheData.DailyRegistrationChart chart = new ProfileCacheData.DailyRegistrationChart();
         LocalDate today = LocalDate.now();

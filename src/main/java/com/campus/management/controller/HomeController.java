@@ -26,12 +26,15 @@ public class HomeController {
         this.registrationService = registrationService;
     }
 
+    // 系统首页
     @GetMapping("/")
     public String index(@RequestParam(defaultValue = "1") int registrationPage,
                         Authentication authentication,
                         Model model) {
         model.addAttribute("systemName", "校园活动管理系统");
+        // 获取热门活动数据
         model.addAttribute("hotActivities", dashboardService.getHotActivities());
+        // 登录用户展示个人报名记录
         if (authentication != null && authentication.isAuthenticated()) {
             SysUser currentUser = userService.findByUsername(authentication.getName());
             Page<ActivityRegistration> registrationPageData = registrationService.pageMyRegistrations(currentUser.getId(), registrationPage, 5);

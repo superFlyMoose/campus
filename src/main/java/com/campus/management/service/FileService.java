@@ -25,16 +25,21 @@ public class FileService extends ServiceImpl<SysFileMapper, SysFile> {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("上传文件不能为空");
         }
+        // 获取原始文件名和扩展名
         String originalFilename = file.getOriginalFilename();
         String extension = StringUtils.getFilenameExtension(originalFilename);
+        // 默认拓展名兜底
         String safeExtension = extension == null ? "dat" : extension.toLowerCase();
         if (!safeExtension.matches("jpg|jpeg|png|gif|webp")) {
             throw new IllegalArgumentException("仅支持 jpg、jpeg、png、gif、webp 格式");
         }
         try {
+            // 构建分类存储目录
             Path categoryPath = Paths.get(uploadDir, category);
             Files.createDirectories(categoryPath);
+            // 生成存储文件名，UUID防冲突
             String storedName = UUID.randomUUID() + "." + safeExtension;
+            // 构建最终存储路径
             Path targetPath = categoryPath.resolve(storedName);
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 

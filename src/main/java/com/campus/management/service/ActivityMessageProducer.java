@@ -14,7 +14,14 @@ public class ActivityMessageProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
+    /**
+     * 发送活动业务消息到RabbitMQ
+     *
+     * @param routingKey 路由键，用于交换机路由到具体队列
+     * @param message    活动事件消息体
+     */
     public void send(String routingKey, ActivityMessage message) {
+        // 发送消息到指定交换机，通过routingKey进行路由
         rabbitTemplate.convertAndSend(RabbitMqConfig.ACTIVITY_EXCHANGE, routingKey, message);
     }
 }

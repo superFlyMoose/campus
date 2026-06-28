@@ -36,18 +36,22 @@ public class AdminController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // 管理员控制台首页
     @GetMapping("/admin/dashboard")
     public String dashboard(@RequestParam(defaultValue = "activity") String tab,
                             @RequestParam(defaultValue = "1") int page,
                             Model model) {
         model.addAttribute("activeTab", tab);
+        // 用户管理模块
         if ("users".equals(tab)) {
             Page<SysUser> userPage = userService.pageUsers(page, 10);
             model.addAttribute("userPage", userPage);
         } else if ("stats".equals(tab)) {
+            // 数据统计模块
             model.addAttribute("summary", dashboardService.getSummary());
             model.addAttribute("chartData", dashboardService.getChartData());
         } else {
+            // 活动管理模块（默认）
             Page<Activity> activityPage = activityService.searchActivities("", "", page, 8);
             model.addAttribute("activityPage", activityPage);
             model.addAttribute("activeTab", "activity");
@@ -60,6 +64,7 @@ public class AdminController {
         return "redirect:/admin/dashboard?tab=users&page=" + page;
     }
 
+    // 新增用户页面
     @GetMapping("/admin/users/create")
     public String createUserPage(Model model) {
         if (!model.containsAttribute("userForm")) {
@@ -72,6 +77,7 @@ public class AdminController {
         return "admin/user-form";
     }
 
+    // 创建用户
     @PostMapping("/admin/users/create")
     public String createUser(@Valid @ModelAttribute UserForm userForm,
                              BindingResult bindingResult,
@@ -99,6 +105,7 @@ public class AdminController {
         return "redirect:/admin/dashboard?tab=users";
     }
 
+    // 编辑用户页面
     @GetMapping("/admin/users/{id}/edit")
     public String editUserPage(@PathVariable Long id, Model model) {
         SysUser user = userService.getById(id);
@@ -115,6 +122,7 @@ public class AdminController {
         return "admin/user-form";
     }
 
+    // 更新用户
     @PostMapping("/admin/users/{id}/edit")
     public String editUser(@PathVariable Long id,
                            @Valid @ModelAttribute UserForm userForm,
@@ -131,6 +139,7 @@ public class AdminController {
             user.setUsername(userForm.getUsername());
             user.setRealName(userForm.getRealName());
             user.setRole(userForm.getRole());
+            // 仅当填写新密码时才更新
             if (userForm.getPassword() != null && !userForm.getPassword().isBlank()) {
                 user.setPassword(passwordEncoder.encode(userForm.getPassword()));
             }
@@ -145,6 +154,7 @@ public class AdminController {
         return "redirect:/admin/dashboard?tab=users";
     }
 
+    // 删除用户
     @PostMapping("/admin/users/{id}/delete")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         userService.deleteUser(id);

@@ -40,12 +40,14 @@ public class ActivityController {
         this.userService = userService;
     }
 
+    // 活动列表页，支持分页+搜索
     @GetMapping
     public String list(@RequestParam(defaultValue = "") String keyword,
                        @RequestParam(defaultValue = "") String location,
                        @RequestParam(defaultValue = "1") int page,
                        Model model) {
-        Page<Activity> pageData = activityCacheService.getActivityList(keyword, location, page);
+        Page<Activity> pageData = activityCacheService.getActivityList(keyword, location, page); // 先查缓存
+        // 缓存未命中则查数据库并回填缓存
         if (pageData == null) {
             pageData = activityService.searchActivities(keyword, location, page, 6);
             activityCacheService.cacheActivityList(keyword, location, page, pageData);
@@ -56,15 +58,17 @@ public class ActivityController {
         return "activity/list";
     }
 
+    // 活动详情页
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Authentication authentication, Model model) {
-        Activity activity = activityCacheService.getActivityDetail(id);
+        Activity activity = activityCacheService.getActivityDetail(id); // 详情缓存查询
         if (activity == null) {
             activity = activityService.getActivityOrThrow(id);
             activityCacheService.cacheActivityDetail(activity);
         }
         model.addAttribute("activity", activity);
         model.addAttribute("canRegister", activityService.canRegister(activity));
+        // 登录用户报名状态判断
         if (authentication != null) {
             SysUser currentUser = userService.findByUsername(authentication.getName());
             model.addAttribute("hasRegistered", registrationService.hasRegistered(id, currentUser.getId()));
@@ -74,6 +78,7 @@ public class ActivityController {
         return "activity/detail";
     }
 
+    // 管理员：创建活动页面
     @GetMapping("/admin/create")
     public String createPage(Model model) {
         if (!model.containsAttribute("activityForm")) {
@@ -84,12 +89,14 @@ public class ActivityController {
         return "activity/form";
     }
 
+    // 管理员：创建活动提交
     @PostMapping("/admin/create")
     public String create(@Valid @ModelAttribute ActivityForm activityForm,
                          BindingResult bindingResult,
                          Model model,
                          RedirectAttributes redirectAttributes,
                          @RequestParam(name = "imageFile", required = false) MultipartFile imageFile) {
+        // 表单校验失败
         if (bindingResult.hasErrors()) {
             model.addAttribute("formAction", "/activities/admin/create");
             model.addAttribute("pageTitle", "发布活动");
@@ -108,6 +115,7 @@ public class ActivityController {
         return "redirect:/activities";
     }
 
+    // 管理员：编辑页面
     @GetMapping("/admin/{id}/edit")
     public String editPage(@PathVariable Long id, Model model) {
         Activity activity = activityService.getActivityOrThrow(id);
@@ -125,6 +133,7 @@ public class ActivityController {
         return "activity/form";
     }
 
+    // 管理员：编辑提交
     @PostMapping("/admin/{id}/edit")
     public String edit(@PathVariable Long id,
                        @Valid @ModelAttribute ActivityForm activityForm,
@@ -150,6 +159,7 @@ public class ActivityController {
         return "redirect:/activities/" + id;
     }
 
+    // 管理员：删除活动
     @PostMapping("/admin/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         activityService.removeActivity(id);

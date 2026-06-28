@@ -28,15 +28,19 @@ public class FileController {
         this.profileCacheService = profileCacheService;
     }
 
+    // 用户头像上传
     @PostMapping("/avatar")
     public String uploadAvatar(MultipartFile file,
                                Authentication authentication,
                                RedirectAttributes redirectAttributes) {
         try {
             SysUser currentUser = userService.findByUsername(authentication.getName());
+            // 保存文件并获取存储路径
             SysFile savedFile = fileService.saveFile(file, currentUser.getId(), "avatar");
+            // 更新用户头像路径
             currentUser.setAvatar(savedFile.getFilePath());
             userService.updateById(currentUser);
+            // 清除用户资料缓存
             profileCacheService.evictProfileCache(currentUser.getId());
             redirectAttributes.addFlashAttribute("successMessage", "头像上传成功");
         } catch (RuntimeException ex) {
@@ -45,6 +49,7 @@ public class FileController {
         return "redirect:/user/profile";
     }
 
+    // 活动图片上传
     @PostMapping("/activity/{activityId}/image")
     public String uploadActivityImage(@PathVariable Long activityId,
                                       MultipartFile file,
@@ -52,6 +57,7 @@ public class FileController {
                                       RedirectAttributes redirectAttributes) {
         try {
             SysUser currentUser = userService.findByUsername(authentication.getName());
+            // 保存活动图片文件
             SysFile savedFile = fileService.saveFile(file, currentUser.getId(), "activity");
             redirectAttributes.addFlashAttribute("successMessage", "活动图片上传成功，路径：" + savedFile.getFilePath());
         } catch (RuntimeException ex) {

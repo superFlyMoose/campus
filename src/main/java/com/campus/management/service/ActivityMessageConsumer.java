@@ -12,8 +12,13 @@ public class ActivityMessageConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(ActivityMessageConsumer.class);
 
+    /**
+     * RabbitMQ 消费者
+     * 监听活动业务消息队列，处理异步事件
+     */
     @RabbitListener(queues = RabbitMqConfig.ACTIVITY_QUEUE)
     public void onMessage(ActivityMessage message) {
+        // 记录消费日志：用于追踪消息流转与问题排查
         log.info("RabbitMQ消息消费成功: eventType={}, activityId={}, activityTitle={}, userId={}, username={}, eventTime={}, description={}",
             message.getEventType(),
             message.getActivityId(),

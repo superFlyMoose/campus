@@ -22,37 +22,39 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        http // 配置请求授权规则
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
                 .requestMatchers("/admin/**", "/activities/admin/**").hasRole("ADMIN")
                 .requestMatchers("/user/**", "/activities/**", "/registrations/**").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated()
+                .anyRequest().authenticated()// 其余请求需登录
             )
-            .formLogin(form -> form
+            .formLogin(form -> form // 表单登录配置
                 .loginPage("/login")
                 .failureUrl("/login?error")
                 .defaultSuccessUrl("/", true)
                 .permitAll()
             )
-            .logout(logout -> logout
+            .logout(logout -> logout // 退出登录配置
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
             )
-            .exceptionHandling(exception -> exception
+            .exceptionHandling(exception -> exception // 异常处理（权限不足）
                 .accessDeniedHandler(accessDeniedHandler())
             )
-            .userDetailsService(customUserDetailsService)
+            .userDetailsService(customUserDetailsService) // 自定义用户认证服务
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(Customizer.withDefaults());
         return http.build();
     }
 
+    // 权限不足处理器
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return (request, response, accessDeniedException) -> response.sendRedirect("/?denied=true");
     }
 
+    // 密码加密器
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

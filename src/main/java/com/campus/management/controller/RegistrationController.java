@@ -21,6 +21,7 @@ public class RegistrationController {
         this.userService = userService;
     }
 
+    // 活动报名
     @PostMapping("/activity/{activityId}")
     public String register(@PathVariable Long activityId,
                            Authentication authentication,
@@ -34,6 +35,7 @@ public class RegistrationController {
         return "redirect:/activities/" + activityId;
     }
 
+    // 取消报名
     @PostMapping("/{registrationId}/cancel")
     public String cancel(@PathVariable Long registrationId,
                          Authentication authentication,
@@ -47,6 +49,7 @@ public class RegistrationController {
         return "redirect:/";
     }
 
+    // 获取当前登录用户
     private SysUser getCurrentUser(Authentication authentication) {
         return userService.findByUsername(authentication.getName());
     }

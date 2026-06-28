@@ -19,6 +19,9 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
         this.dashboardCacheService = dashboardCacheService;
     }
 
+    /**
+     * 用户注册
+     */
     public void register(SysUser user) {
         validateUsernameUnique(user.getUsername(), null);
         user.setRole("USER");
@@ -28,6 +31,9 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
         dashboardCacheService.evictDashboardCache();
     }
 
+    /**
+     * 用户分页查询
+     */
     public Page<SysUser> pageUsers(int pageNum, int pageSize) {
         return lambdaQuery()
             .eq(SysUser::getIsDeleted, 0)
@@ -35,6 +41,9 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
             .page(new Page<>(pageNum, pageSize));
     }
 
+    /**
+     * 后台创建用户
+     */
     public void createUser(SysUser user) {
         validateUsernameUnique(user.getUsername(), null);
         user.setAvatar(user.getAvatar() == null ? "" : user.getAvatar());
@@ -43,6 +52,9 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
         dashboardCacheService.evictDashboardCache();
     }
 
+    /**
+     * 更新用户信息
+     */
     public void updateUser(Long id, SysUser updatedUser) {
         SysUser existingUser = getById(id);
         if (existingUser == null) {
@@ -52,6 +64,7 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
         existingUser.setUsername(updatedUser.getUsername());
         existingUser.setRealName(updatedUser.getRealName());
         existingUser.setRole(updatedUser.getRole());
+        // 密码非空才更新
         if (StringUtils.hasText(updatedUser.getPassword())) {
             existingUser.setPassword(updatedUser.getPassword());
         }
@@ -60,12 +73,18 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
         dashboardCacheService.evictDashboardCache();
     }
 
+    /**
+     * 删除用户
+     */
     public void deleteUser(Long id) {
         removeById(id);
         profileCacheService.evictProfileCache(id);
         dashboardCacheService.evictDashboardCache();
     }
 
+    /**
+     * 根据用户名查询用户
+     */
     public SysUser findByUsername(String username) {
         return lambdaQuery()
             .eq(SysUser::getUsername, username)
@@ -73,6 +92,9 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
             .one();
     }
 
+    /**
+     * 用户名唯一性检验
+     */
     private void validateUsernameUnique(String username, Long excludeId) {
         boolean exists = lambdaQuery()
             .eq(SysUser::getUsername, username)

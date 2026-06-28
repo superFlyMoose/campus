@@ -23,6 +23,7 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // 注册页面
     @GetMapping("/register")
     public String registerPage(Model model) {
         if (!model.containsAttribute("registerForm")) {
@@ -31,18 +32,22 @@ public class AuthController {
         return "register";
     }
 
+    // 用户注册提交
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("registerForm") RegisterForm registerForm,
                            BindingResult bindingResult,
                            RedirectAttributes redirectAttributes) {
+        // 校验两次密码是否一致
         if (!bindingResult.hasFieldErrors("password")
                 && !bindingResult.hasFieldErrors("confirmPassword")
                 && !registerForm.getPassword().equals(registerForm.getConfirmPassword())) {
             bindingResult.rejectValue("confirmPassword", "registerError", "两次输入的密码不一致");
         }
+        // 表单校验失败则返回注册页
         if (bindingResult.hasErrors()) {
             return "register";
         }
+        // 构建用户实体并加密密码
         SysUser user = new SysUser();
         user.setUsername(registerForm.getUsername());
         user.setRealName(registerForm.getRealName());

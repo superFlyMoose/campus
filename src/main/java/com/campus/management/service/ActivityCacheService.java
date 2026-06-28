@@ -20,10 +20,12 @@ import org.springframework.util.DigestUtils;
 
 @Service
 public class ActivityCacheService {
-
     private static final Logger log = LoggerFactory.getLogger(ActivityCacheService.class);
+    // 活动详情缓存key前缀
     private static final String ACTIVITY_DETAIL_KEY_PREFIX = "activity:detail:";
+    // 活动详情列表key前缀
     private static final String ACTIVITY_LIST_KEY_PREFIX = "activity:list:";
+    // 缓存过期时间
     private static final Duration CACHE_TTL = Duration.ofMinutes(10);
 
     private final StringRedisTemplate stringRedisTemplate;
@@ -36,15 +38,15 @@ public class ActivityCacheService {
 
     public Activity getActivityDetail(Long activityId) {
         String cacheKey = ACTIVITY_DETAIL_KEY_PREFIX + activityId;
-        String cachedJson = readCacheSafely(cacheKey);
+        String cachedJson = readCacheSafely(cacheKey); // 读取缓存
         if (cachedJson == null || cachedJson.isBlank()) {
-            return null;
+            return null; // 未命中返回NULL
         }
         try {
             return toActivity(objectMapper.readValue(cachedJson, ActivityCacheItem.class));
         } catch (JsonProcessingException exception) {
             log.error("活动详情缓存反序列化失败, key={}", cacheKey, exception);
-            evictActivityDetailCache(activityId);
+            evictActivityDetailCache(activityId); // 清理脏数据
             return null;
         }
     }
@@ -53,6 +55,7 @@ public class ActivityCacheService {
         String cacheKey = ACTIVITY_DETAIL_KEY_PREFIX + activity.getId();
         try {
             String cacheValue = objectMapper.writeValueAsString(toCacheItem(activity));
+            // 写入Redis并设置TTL
             stringRedisTemplate.opsForValue().set(cacheKey, cacheValue, CACHE_TTL);
         } catch (JsonProcessingException exception) {
             log.error("活动详情缓存序列化失败, key={}", cacheKey, exception);
@@ -70,7 +73,9 @@ public class ActivityCacheService {
             return null;
         }
         try {
+            // 反序列化分页结构
             ActivityListCacheData cacheData = objectMapper.readValue(cachedJson, ActivityListCacheData.class);
+            // 重建分页对象
             Page<Activity> pageData = new Page<>(cacheData.getCurrent(), cacheData.getSize(), cacheData.getTotal());
             pageData.setPages(cacheData.getPages());
             List<Activity> records = cacheData.getRecords() == null
@@ -88,10 +93,12 @@ public class ActivityCacheService {
     public void cacheActivityList(String keyword, String location, int pageNum, Page<Activity> pageData) {
         String cacheKey = buildActivityListCacheKey(keyword, location, pageNum);
         ActivityListCacheData cacheData = new ActivityListCacheData();
+        // 分页元数据缓存，避免重复计算
         cacheData.setCurrent(pageData.getCurrent());
         cacheData.setSize(pageData.getSize());
         cacheData.setTotal(pageData.getTotal());
         cacheData.setPages(pageData.getPages());
+        // 数据列表压缩为Cache DTO，减少冗余字段
         cacheData.setRecords(pageData.getRecords() == null
             ? Collections.emptyList()
             : pageData.getRecords().stream().map(this::toCacheItem).toList());
@@ -154,11 +161,12 @@ public class ActivityCacheService {
 
     private String buildActivityListCacheKey(String keyword, String location, int pageNum) {
         String rawKey = normalize(keyword) + "|" + normalize(location) + "|" + pageNum;
+        // MD5压缩，避免key过长
         return ACTIVITY_LIST_KEY_PREFIX + DigestUtils.md5DigestAsHex(rawKey.getBytes(StandardCharsets.UTF_8));
     }
 
     private String normalize(String value) {
-        return value == null ? "" : value.trim();
+        return value == null ? "" : value.trim(); // 防止null污染key结构
     }
 
     private String readCacheSafely(String cacheKey) {
@@ -184,9 +192,9 @@ public class ActivityCacheService {
 
     private void deleteByPattern(String pattern) {
         try {
-            Set<String> keys = stringRedisTemplate.keys(pattern);
+            Set<String> keys = stringRedisTemplate.keys(pattern); // 模糊匹配
             if (keys != null && !keys.isEmpty()) {
-                stringRedisTemplate.delete(keys);
+                stringRedisTemplate.delete(keys); // 批量删除
             }
         } catch (RuntimeException exception) {
             log.error("活动缓存批量删除失败, pattern={}", pattern, exception);
