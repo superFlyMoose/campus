@@ -511,7 +511,7 @@
     </div>
 </div>
 <script th:inline="javascript">
-    const chartData = /*[[${chartData}]]*/ {};
+    const chartData = {};
     const canvas = document.getElementById('dashboardChart');
     if (canvas && chartData.labels) {
         const context = canvas.getContext('2d');

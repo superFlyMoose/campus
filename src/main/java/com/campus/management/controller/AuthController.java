@@ -35,11 +35,12 @@ public class AuthController {
     public String register(@Valid @ModelAttribute("registerForm") RegisterForm registerForm,
                            BindingResult bindingResult,
                            RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            return "register";
+        if (!bindingResult.hasFieldErrors("password")
+                && !bindingResult.hasFieldErrors("confirmPassword")
+                && !registerForm.getPassword().equals(registerForm.getConfirmPassword())) {
+            bindingResult.rejectValue("confirmPassword", "registerError", "两次输入的密码不一致");
         }
-        if (!registerForm.getPassword().equals(registerForm.getConfirmPassword())) {
-            bindingResult.reject("registerError", "两次输入的密码不一致");
+        if (bindingResult.hasErrors()) {
             return "register";
         }
         SysUser user = new SysUser();

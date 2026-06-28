@@ -296,7 +296,8 @@
                                 <div class="col-md-6">
                                     <label class="form-label">确认密码</label>
                                     <input type="password" th:field="*{confirmPassword}" class="form-control" placeholder="请再次输入密码">
-                                    <div class="text-danger small mt-1" th:errors="*{confirmPassword}"></div>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                                    <div class="form-text text-muted mt-1" th:unless="${#fields.hasErrors('confirmPassword')}">两次密码不一致</div>
                                 </div>
                             </div>
                         </div>
